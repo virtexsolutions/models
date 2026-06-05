@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kia Sales Hub</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap');
+
+:root {
+  --kia-red: #BB162B;
+  --kia-red-dark: #8C1020;
+  --kia-red-glow: rgba(187,22,43,0.35);
+  --ink: #050D14;
+  --ink-90: #0B1820;
+  --ink-80: #0F2030;
+  --ink-60: #1C3548;
+  --ink-40: #2E5068;
+  --ink-20: #4A7090;
+  --surface: #0A1929;
+  --surface-2: #0D2238;
+  --surface-3: #122840;
+  --glass: rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.07);
+  --glass-border-bright: rgba(255,255,255,0.13);
+  --text-primary: rgba(255,255,255,0.92);
+  --text-secondary: rgba(255,255,255,0.5);
+  --text-muted: rgba(255,255,255,0.28);
+  --accent-cyan: #00C8FF;
+  --accent-cyan-dim: rgba(0,200,255,0.12);
+  --gold: #C99A00;
+  --gold-dim: rgba(201,154,0,0.15);
+  --border: rgba(255,255,255,0.07);
+  --border-accent: rgba(0,200,255,0.2);
+  --radius: 3px;
+  --radius-lg: 6px;
+  --shadow: 0 0 0 1px rgba(0,200,255,0.06), 0 8px 32px rgba(0,0,0,0.4);
+  --glow-red: 0 0 20px rgba(187,22,43,0.4);
+  --glow-cyan: 0 0 20px rgba(0,200,255,0.15);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background: var(--ink);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── SCANLINE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+}
+
+/* ── HEADER ── */
+.site-header {
+  background: var(--ink-90);
+  padding: 0 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px; position: sticky; top: 0; z-index: 200; width: 100%;
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 rgba(0,200,255,0.08), 0 4px 20px rgba(0,0,0,0.5);
+}
+.site-wordmark {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 3px; text-transform: uppercase;
+}
+.hdr-right {
+  font-size: 10px; color: var(--text-muted);
+  letter-spacing: 3px; text-transform: uppercase; font-weight: 500;
+}
+
+/* ── SCREEN ── */
+.screen { width: 100%; position: relative; z-index: 1; }
+
+/* ── KB LAYOUT ── */
+#screen-kb { min-height: calc(100vh - 56px); background: var(--ink); }
+.kb-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 56px); }
+
+/* ── SIDEBAR ── */
+.kb-sidebar {
+  background: var(--ink-90);
+  border-right: 1px solid var(--glass-border);
+  overflow-y: auto; position: sticky; top: 56px; height: calc(100vh - 56px);
+  scrollbar-width: thin; scrollbar-color: rgba(0,200,255,0.15) transparent;
+}
+.kb-sidebar::-webkit-scrollbar { width: 3px; }
+.kb-sidebar::-webkit-scrollbar-thumb { background: rgba(0,200,255,0.15); border-radius: 2px; }
+
+.kb-sidebar-header {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--glass-border);
+}
+.kb-sidebar-title {
+  font-size: 9px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px;
+}
+.kb-tab-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.kb-tab-btn {
+  padding: 8px 0; border: 1px solid var(--glass-border-bright);
+  border-radius: var(--radius); background: transparent;
+  color: var(--text-muted); font-size: 10px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all 0.15s;
+}
+.kb-tab-btn.active {
+  background: var(--kia-red); border-color: var(--kia-red);
+  color: white; box-shadow: var(--glow-red);
+}
+.kb-tab-btn:hover:not(.active) { background: var(--glass); color: var(--text-primary); }
+
+.kb-cat {
+  padding: 18px 18px 5px;
+  font-size: 9px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--kia-red);
+  opacity: 0.7;
+}
+.kb-model-btn {
+  width: 100%; padding: 9px 18px;
+  background: transparent; border: none; border-left: 2px solid transparent;
+  text-align: left; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all 0.12s;
+  display: flex; align-items: center; justify-content: space-between;
+  position: relative;
+}
+.kb-model-btn::after {
+  content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 0;
+  background: linear-gradient(to left, rgba(0,200,255,0.04), transparent);
+  transition: width 0.2s;
+}
+.kb-model-btn:hover::after { width: 100%; }
+.kb-model-btn:hover { border-left-color: rgba(0,200,255,0.3); }
+.kb-model-btn.active {
+  background: rgba(187,22,43,0.1);
+  border-left-color: var(--kia-red);
+  box-shadow: inset 0 0 20px rgba(187,22,43,0.05);
+}
+.kb-model-name { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.2; }
+.kb-model-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; letter-spacing: 0.3px; }
+
+/* ── SEARCH INPUT IN SIDEBAR ── */
+.kb-search-wrap { padding: 16px 18px; }
+.kb-search-wrap input {
+  width: 100%; padding: 9px 12px;
+  border: 1px solid var(--glass-border-bright);
+  border-radius: var(--radius); background: var(--glass);
+  color: var(--text-primary); font-size: 13px;
+  font-family: 'Inter', sans-serif; outline: none; transition: all 0.15s;
+}
+.kb-search-wrap input::placeholder { color: var(--text-muted); }
+.kb-search-wrap input:focus {
+  border-color: var(--kia-red);
+  box-shadow: 0 0 0 2px var(--kia-red-glow);
+  background: rgba(187,22,43,0.04);
+}
+.kb-search-hint { font-size: 9px; color: var(--text-muted); margin-top: 8px; letter-spacing: 0.5px; line-height: 1.6; }
+
+/* ── CONTENT AREA ── */
+.kb-content { padding: 40px 48px; overflow-y: auto; max-width: 1100px; }
+
+/* ── WELCOME ── */
+.kb-welcome { display: flex; align-items: center; justify-content: center; height: 65vh; text-align: center; }
+.kb-welcome-inner { max-width: 420px; }
+.kb-welcome-mark { width: 40px; height: 2px; background: var(--kia-red); margin: 0 auto 28px; box-shadow: var(--glow-red); }
+.kb-welcome h2 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 26px; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 12px; letter-spacing: 2px; text-transform: uppercase;
+}
+.kb-welcome p { font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
+
+/* ── MODEL HEADER ── */
+.kb-model-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 46px; font-weight: 700; color: var(--text-primary);
+  line-height: 1; margin-bottom: 6px;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.kb-model-tagline { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6; }
+.kb-meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.kb-meta-pill {
+  padding: 5px 12px; border-radius: var(--radius);
+  font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+  background: var(--glass); color: var(--text-secondary);
+  border: 1px solid var(--glass-border-bright);
+}
+.kb-meta-pill.hl {
+  background: var(--kia-red); color: white; border-color: var(--kia-red);
+  box-shadow: var(--glow-red);
+}
+.overview-box {
+  background: var(--surface-2);
+  border-radius: var(--radius-lg); padding: 16px 20px;
+  font-size: 13px; color: var(--text-secondary); line-height: 1.8;
+  margin-bottom: 28px; border-left: 2px solid var(--kia-red);
+  border: 1px solid var(--glass-border);
+  border-left: 2px solid var(--kia-red);
+  box-shadow: var(--shadow);
+}
+.new-tag {
+  display: inline-block; background: var(--kia-red); color: white;
+  font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 2px; margin-left: 10px;
+  vertical-align: middle; position: relative; top: -3px;
+  box-shadow: var(--glow-red);
+}
+
+/* ── TRIM TABS ── */
+.trim-tabs {
+  display: flex; border-bottom: 1px solid var(--glass-border);
+  margin-bottom: 24px; overflow-x: auto; gap: 0;
+}
+.trim-tab {
+  padding: 11px 20px; border: none; background: transparent;
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+  color: var(--text-muted); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  white-space: nowrap; transition: all 0.12s; flex-shrink: 0;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.trim-tab:hover { color: var(--text-primary); }
+.trim-tab.active { color: var(--kia-red); border-bottom-color: var(--kia-red); }
+
+/* ── TRIM CONTENT ── */
+.trim-content { display: none; }
+.trim-content.active { display: block; }
+.trim-top { margin-bottom: 22px; }
+.trim-name-big {
+  font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 700;
+  color: var(--text-primary); text-transform: uppercase; letter-spacing: 1px;
+}
+.trim-tagline { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+.trim-price { font-size: 15px; font-weight: 700; color: var(--kia-red); margin-top: 6px; letter-spacing: 0.5px; }
+.trim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+/* ── CARDS ── */
+.trim-card {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg); padding: 20px;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s;
+}
+.trim-card:hover { border-color: var(--glass-border-bright); }
+.trim-card-title {
+  font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.trim-card-title::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+
+/* ── SELLING POINTS ── */
+.selling-points { list-style: none; padding: 0; }
+.selling-points li {
+  padding: 8px 0; border-bottom: 1px solid var(--glass-border);
+  font-size: 13px; color: var(--text-secondary); line-height: 1.5;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.selling-points li:last-child { border-bottom: none; }
+.selling-points li::before {
+  content: ''; display: block; width: 3px; height: 3px;
+  border-radius: 50%; background: var(--accent-cyan);
+  flex-shrink: 0; margin-top: 7px;
+  box-shadow: 0 0 6px var(--accent-cyan);
+}
+.selling-points li.upgrade {
+  background: var(--gold-dim) !important;
+  border-radius: var(--radius) !important;
+  padding: 10px 12px !important;
+  border-bottom: none !important;
+  margin-bottom: 5px;
+  border: 1px solid rgba(201,154,0,0.3) !important;
+}
+.selling-points li.upgrade::before { display: none; }
+.upgrade-label {
+  display: inline-flex; align-items: center;
+  background: var(--gold); color: var(--ink);
+  font-size: 8px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 2px; margin-right: 10px;
+  flex-shrink: 0; white-space: nowrap;
+  box-shadow: 0 0 10px rgba(201,154,0,0.4);
+}
+.selling-points li.upgrade span { color: var(--text-primary); font-size: 13px; line-height: 1.5; }
+
+/* Feature highlight rows */
+.selling-points li.feat-highlight {
+  background: rgba(255,255,255,0.03) !important;
+  border-radius: var(--radius) !important;
+  padding: 9px 12px !important;
+  border-bottom: none !important;
+  margin-bottom: 4px;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap;
+}
+.selling-points li.feat-highlight::before { display: none; }
+.selling-points li.feat-highlight span { color: var(--text-secondary); font-size: 13px; line-height: 1.5; flex: 1; min-width: 0; }
+
+/* Feature tags — inline pill badges */
+.feat-tag {
+  display: inline-flex; align-items: center;
+  font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 2px;
+  flex-shrink: 0; white-space: nowrap; align-self: flex-start; margin-top: 2px;
+}
+.ft-leather { background: rgba(160,100,40,0.2); color: #D4924A; border: 1px solid rgba(160,100,0,0.35); }
+.ft-sunroof { background: rgba(0,180,255,0.12); color: var(--accent-cyan); border: 1px solid rgba(0,180,255,0.28); }
+.ft-hev     { background: rgba(40,180,80,0.12); color: #4DCB7A; border: 1px solid rgba(40,180,80,0.3); }
+.ft-phev    { background: rgba(120,80,255,0.12); color: #A07EFF; border: 1px solid rgba(120,80,255,0.3); }
+
+/* NEW badge on upgrade rows that also have feature tags */
+.selling-points li.upgrade .feat-tag { margin-top: 2px; }
+
+/* ── MSRP CARD ── */
+.trim-price-big {
+  font-family: 'Rajdhani', sans-serif; font-size: 40px; font-weight: 700;
+  color: var(--text-primary); letter-spacing: 0.5px;
+}
+.trim-price-note { font-size: 11px; color: var(--text-muted); margin-top: 5px; letter-spacing: 0.3px; }
+
+/* ── TALK TRACK ── */
+.talk-track {
+  background: var(--ink-80);
+  border-radius: var(--radius);
+  padding: 16px 18px; margin-top: 16px;
+  border: 1px solid var(--glass-border);
+  border-left: 2px solid var(--kia-red);
+  box-shadow: var(--shadow), inset 0 0 30px rgba(187,22,43,0.03);
+}
+.talk-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--kia-red); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.talk-label::after { content: ''; flex: 1; height: 1px; background: rgba(187,22,43,0.25); }
+.talk-track p { font-size: 13px; color: var(--text-secondary); line-height: 1.75; }
+
+/* ── OBJECTIONS ── */
+.objections-section {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 24px; margin-top: 24px;
+  box-shadow: var(--shadow);
+}
+.obj-header {
+  font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+.obj-header::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+.obj-item { padding: 16px 0; border-bottom: 1px solid var(--glass-border); }
+.obj-item:last-child { border-bottom: none; }
+.obj-q {
+  font-size: 13px; font-weight: 600; color: var(--text-primary);
+  margin-bottom: 8px; padding-left: 14px;
+  border-left: 2px solid var(--kia-red);
+  line-height: 1.5;
+}
+.obj-a { font-size: 13px; color: var(--text-secondary); line-height: 1.75; padding-left: 14px; margin-top: 6px; }
+
+/* ── SECTION DIVIDER LINE (decorative) ── */
+.model-divider {
+  height: 1px; background: linear-gradient(to right, var(--kia-red), rgba(0,200,255,0.3), transparent);
+  margin-bottom: 28px; box-shadow: 0 0 8px rgba(187,22,43,0.3);
+}
+
+/* ── SEARCH RESULTS ── */
+.search-results-header { margin-bottom: 24px; }
+.search-results-title {
+  font-family: 'Rajdhani', sans-serif; font-size: 30px; font-weight: 700;
+  color: var(--text-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;
+}
+.search-results-meta { font-size: 12px; color: var(--text-secondary); }
+.search-model-card {
+  background: var(--surface); border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg); padding: 20px; margin-bottom: 12px;
+  box-shadow: var(--shadow); transition: border-color 0.15s;
+}
+.search-model-card:hover { border-color: var(--glass-border-bright); }
+.search-model-name {
+  font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700;
+  color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px;
+}
+.search-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--glass-border);
+}
+.search-view-btn {
+  padding: 6px 14px; border: 1px solid var(--kia-red);
+  border-radius: var(--radius); background: transparent;
+  color: var(--kia-red); font-size: 10px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all 0.15s;
+}
+.search-view-btn:hover { background: var(--kia-red); color: white; box-shadow: var(--glow-red); }
+.search-trim-row {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 10px 0; border-bottom: 1px solid var(--glass-border);
+}
+.search-trim-row:last-child { border-bottom: none; }
+.search-trim-name { font-size: 13px; font-weight: 600; color: var(--text-primary); min-width: 140px; flex-shrink: 0; }
+.search-trim-price { font-size: 11px; color: var(--kia-red); font-weight: 700; margin-top: 3px; }
+.search-trim-note { font-size: 13px; color: var(--text-secondary); line-height: 1.6; flex: 1; }
+.search-empty { text-align: center; padding: 80px 20px; }
+.search-empty-line { width: 32px; height: 2px; background: var(--kia-red); margin: 0 auto 28px; box-shadow: var(--glow-red); }
+.search-empty-title {
+  font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700;
+  color: var(--text-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
+}
+.search-empty-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
+
+/* ── SCROLLBAR (content area) ── */
+.kb-content::-webkit-scrollbar { width: 4px; }
+.kb-content::-webkit-scrollbar-track { background: transparent; }
+.kb-content::-webkit-scrollbar-thumb { background: rgba(0,200,255,0.12); border-radius: 2px; }
+
+/* ── PRINT ── */
+@media print {
+  .site-header, .kb-sidebar { display: none !important; }
+  body { background: white; color: black; }
+  .kb-content { padding: 0; max-width: 100%; }
+}
+
+/* ── MOBILE ── */
+
+
+
+
+/* ══════════════════════════════════════════
+   MOBILE — max-width 768px
+   ══════════════════════════════════════════ */
+
+
+/* Desktop: hide mobile-only elements */
+
+
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-wordmark">2026 / 2027 Sales Hub</div>
+  <div class="hdr-right" id="hdr-right">Knowledge Base</div>
+</header>
+
+<!-- HOME SCREEN -->
+<!-- KNOWLEDGE BASE -->
+<div class="screen" id="screen-kb" style="display:block">
+  <div class="kb-overlay" id="kb-overlay" onclick="closeSidebar()"></div>
+  <div class="mobile-nav-bar">
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      Models
+    </button>
+    <button class="mobile-search-btn" onclick="openMobileSearch()">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Search
+    </button>
+  </div>
+  <div class="kb-layout">
+    <nav class="kb-sidebar">
+      <div class="kb-sidebar-header">
+        <div class="kb-sidebar-title" style="margin-bottom:10px">Kia Lineup 2026–27</div>
+        <div class="kb-tab-row">
+          <button id="kb-tab-models" class="kb-tab-btn active" onclick="switchKbTab('models')">Models</button>
+          <button id="kb-tab-search" class="kb-tab-btn" onclick="switchKbTab('search')">Search</button>
+        </div>
+      </div>
+      <div id="kb-models-list">
+      <div class="kb-cat">Sedans</div>
+      <button class="kb-model-btn" onclick="showModel('k4',this)"><div><div class="kb-model-name">K4</div><div class="kb-model-sub">Compact Sedan / Hatchback</div></div></button>
+      <button class="kb-model-btn" onclick="showModel('k5',this)"><div><div class="kb-model-name">K5</div><div class="kb-model-sub">Mid-Size Sedan</div></div></button>
+      <div class="kb-cat">Small SUVs</div>
+      <button class="kb-model-btn" onclick="showModel('seltos',this)"><div><div class="kb-model-name">Seltos</div><div class="kb-model-sub">Subcompact SUV</div></div></button>
+      <button class="kb-model-btn" onclick="showModel('niro',this)"><div><div class="kb-model-name">Niro</div><div class="kb-model-sub">Hybrid / PHEV / EV</div></div></button>
+      <div class="kb-cat">Mid-Size SUVs</div>
+      <button class="kb-model-btn" onclick="showModel('sportage',this)"><div><div class="kb-model-name">Sportage</div><div class="kb-model-sub">Compact SUV</div></div></button>
+      <button class="kb-model-btn" onclick="showModel('sorento',this)"><div><div class="kb-model-name">Sorento</div><div class="kb-model-sub">Mid-Size / 3-Row SUV</div></div></button>
+      <div class="kb-cat">Full-Size</div>
+      <button class="kb-model-btn" onclick="showModel('telluride',this)"><div><div class="kb-model-name">Telluride</div><div class="kb-model-sub">3-Row Flagship SUV</div></div></button>
+      <div class="kb-cat">Minivan</div>
+      <button class="kb-model-btn" onclick="showModel('carnival',this)"><div><div class="kb-model-name">Carnival</div><div class="kb-model-sub">8-Passenger MPV</div></div></button>
+      <div class="kb-cat">Electric</div>
+      <button class="kb-model-btn" onclick="showModel('ev6',this)"><div><div class="kb-model-name">EV6</div><div class="kb-model-sub">Electric Crossover</div></div></button>
+      <button class="kb-model-btn" onclick="showModel('ev9',this)"><div><div class="kb-model-name">EV9</div><div class="kb-model-sub">Electric 3-Row SUV</div></div></button>
+      </div>
+      <div id="kb-search-panel" style="display:none" class="kb-search-wrap"><input id="kb-search-input" type="text" placeholder="e.g. ventilated seats, HUD..." oninput="runFeatureSearch()"><div class="kb-search-hint">Feature / trim / keyword search</div></div>
+    </nav>
+    <div class="kb-content">
+      <div class="kb-welcome" id="kb-welcome">
+        <div class="kb-welcome-inner"><div class="kb-welcome-mark"></div><h2>Select a Model</h2><p>Choose a vehicle from the sidebar to view trim levels, pricing, selling points, and objection handling.</p></div>
+      </div>
+      <div id="kb-model-area"></div>
+      <div id="kb-search-area" style="display:none;padding:4px 0"></div>
+    </div>
+  </div>
+  </div>
+</div>
+<script>
+// ===== SCREEN MANAGER =====
+function showScreen(name){
+  ['home','guest','kb'].forEach(function(id){var el=document.getElementById('screen-'+id);if(el)el.style.display='none';});
+  var t=document.getElementById('screen-'+name);if(!t)return;
+  t.style.display=(name==='home')?'flex':'block';
+  var hdr=document.getElementById('hdr-right');
+  if(hdr){if(name==='home')hdr.textContent='Knowledge Base';else if(name==='guest')hdr.textContent='Step '+(S.step+1)+' of 5';else if(name==='kb')hdr.textContent='Knowledge Base';}
+  var nav=document.getElementById('guest-nav');if(nav)nav.style.display=name==='guest'?'flex':'none';
+  window.scrollTo({top:0});
+  if(window.innerWidth<=768){closeSidebar();}
+}
+
+// ===== GUEST SHEET STATE =====
+const S={step:0,fname:'',lname:'',phone:'',email:'',address:'',credit:5,
+  cvYear:'',cvMake:'',cvModel:'',cvMiles:'',cvLike:'',cvHate:'',
+  types:[],passengers:'',uses:[],mustHave:[],niceToHave:[],
+  priorities:[],canGiveUp:[],notes:['','','','','']};
+
+const VEHICLES=[
+  {id:'k4',name:'2026 Kia K4',year:2026,type:['sedan','hatchback'],tagline:'Sharp, tech-forward compact — bold style at an entry price',msrp:24990,msrp_top:28500,features:['tech','wireless','safety','heated'],mpg:'35 mpg',seats:5,awd:false,thirdrow:false,isNew:false,whatsnew:'Replaces the Forte. Available sedan or hatchback. GT-Line Turbo adds 190hp. Standard 12.3" dual touchscreen.',coach:{budget:'Best value compact in the lineup. GT-Line Turbo delivers performance without premium pricing.',features:'12.3" screen standard on every trim — not an upgrade. Wireless CarPlay included.',space:'Surprisingly roomy rear seat. Hatchback adds versatile cargo access.',fuel:'35 mpg combined. Low cost to own.',style:'Bold X-shaped DRL lighting, available two-tone combos.',reliability:'10-year / 100K powertrain warranty — best in class.'}},
+  {id:'k5',name:'2026 Kia K5',year:2026,type:['sedan'],tagline:'Sporty mid-size sedan with AWD — rare, performance-forward, and bold',msrp:27290,msrp_top:37000,features:['awd','tech','wireless','safety','leather','heated'],mpg:'32 mpg',seats:5,awd:true,thirdrow:false,isNew:false,whatsnew:'Available AWD — rare in a mid-size sedan. Turbocharged powertrain. Updated driver-assist tech.',coach:{budget:'A lot of car for the money. AWD beats every competitor at this price.',features:'Available Bose, HUD, ventilated seats, panoramic sunroof.',space:'Generous rear legroom and trunk for the segment.',fuel:'32 mpg with AWD is genuinely impressive.',style:'Best-looking car in its class — wide stance, fast roofline.',reliability:'10-year / 100K warranty on every new Kia.'}},
+  {id:'seltos26',name:'2026 Kia Seltos',year:2026,type:['suv-small'],tagline:'Affordable subcompact SUV with generous tech',msrp:25285,msrp_top:33000,features:['tech','wireless','safety','awd','heated'],mpg:'31 mpg',seats:5,awd:true,thirdrow:false,isNew:false,whatsnew:'Wireless CarPlay standard. AWD available. Strong value before the 2027 redesign — potential dealer incentives.',coach:{budget:'One of the strongest value buys in the segment.',features:'10.25" touchscreen, panoramic sunroof available.',space:'Right-sized for city parking. Comfortable for 4.',fuel:'31 mpg combined — solid for a gas SUV.',style:'Clean, bold styling. Elevated ride height without the bulk.',reliability:'Kia 10-year / 100K warranty.'}},
+  {id:'seltos27',name:'2027 Kia Seltos',year:2027,type:['suv-small','hybrid'],tagline:'All-new redesign — first-ever Seltos hybrid, Telluride-inspired exterior',msrp:25500,msrp_top:33000,features:['tech','wireless','safety','awd','heated','sunroof'],mpg:'38 mpg hybrid',seats:5,awd:true,thirdrow:false,isNew:true,whatsnew:'Complete redesign. Telluride-inspired exterior. First Seltos hybrid at ~$30K. 360-cam, memory seat standard.',coach:{budget:'Hybrid adds ~$5K but reduces fuel costs significantly.',features:'Standard panoramic sunroof, 360-cam, memory seat.',space:'Grew bigger — more rear legroom and cargo than outgoing model.',fuel:'38 mpg hybrid — class-leading for a small SUV.',style:'Dramatic new design — looks like a mini Telluride.',reliability:'Brand-new platform, full warranty.'}},
+  {id:'niro',name:'2026 Kia Niro',year:2026,type:['suv-small','hybrid','electric'],tagline:'Efficiency champion — hybrid, PHEV, or full EV in one nameplate',msrp:28550,msrp_top:40000,features:['tech','wireless','safety','heated','charging'],mpg:'53 mpg hybrid',seats:5,awd:false,thirdrow:false,isNew:false,whatsnew:'Hybrid, PHEV, or full EV. Updated infotainment. This may be last generation before EV3 transition.',coach:{budget:'Hybrid pays for itself quickly in fuel savings.',features:'Solid tech suite and safety package.',space:'Hatchback cargo access is versatile. Good for 2-4.',fuel:'53 mpg combined — best non-EV in the Kia lineup.',style:'Unique hatchback-crossover styling.',reliability:'Proven hybrid system. Full Kia warranty.'}},
+  {id:'sportage',name:'2026 Kia Sportage',year:2026,type:['suv-mid','hybrid'],tagline:'Edmunds top-rated compact SUV — 12.3" screen on every single trim',msrp:30290,msrp_top:42500,features:['tech','wireless','safety','heated','awd','leather','sunroof'],mpg:'26 mpg / 39 mpg hybrid',seats:5,awd:true,thirdrow:false,isNew:false,whatsnew:'12.3" dual screen now standard on ALL trims. New gear-tooth grille. Standard adaptive cruise and parking sensors.',coach:{budget:'EX trim is the sweet spot — solid spec for a modest step up.',features:'12.3" screen everywhere. Bose and HUD on upper trims.',space:'Best-in-class cargo with dual-level floor.',fuel:'Hybrid gets a genuine 39 mpg.',style:'One of the sharpest compact SUVs on the market.',reliability:'Edmunds top pick. 10-year warranty.'}},
+  {id:'sorento',name:'2026 Kia Sorento',year:2026,type:['suv-mid','suv-3row','hybrid'],tagline:'Best-value 3-row family SUV — 37 mpg hybrid, 5,000 lb tow',msrp:33635,msrp_top:48000,features:['tech','wireless','safety','leather','heated','awd','3row','cargo','towing'],mpg:'26 mpg / 37 mpg hybrid',seats:7,awd:true,thirdrow:true,isNew:false,whatsnew:'Updated driver-assist. Hybrid available at 37 mpg. PHEV available. 5,000 lb tow rating.',coach:{budget:'Best-value 3-row on the market. Starts well below Telluride.',features:'Available panoramic sunroof, Bose, HUD, ventilated seats.',space:'87 cu ft max cargo. Real 3rd row adults can use.',fuel:'37 mpg hybrid — best for a 3-row SUV.',style:'Clean, upscale exterior. Looks more expensive than it is.',reliability:'KBB #4 Best 3-Row. 10-year / 100K.'}},
+  {id:'telluride',name:'2027 Kia Telluride',year:2027,type:['suv-3row'],tagline:'Completely redesigned — bigger, bolder, and now available as a hybrid',msrp:40735,msrp_top:57285,features:['tech','wireless','safety','leather','heated','awd','3row','cargo','towing','ventilated','sound','hud'],mpg:'21 mpg / hybrid coming',seats:8,awd:true,thirdrow:true,isNew:true,whatsnew:'Skipped 2026 for a complete redesign. Larger, boxier. Adults fit all 3 rows. New hybrid. X-Pro off-road trim.',coach:{budget:'If budget is tight, Sorento gives similar capability for $7K+ less.',features:'Fully loaded: 5-zone climate, Bose, HUD, panoramic sunroof.',space:'Biggest Kia made. Third row fits adults.',fuel:'Gas 21 mpg. Hybrid version significantly better.',style:'Bold, boxy new design — commands presence.',reliability:"KBB's best 3-row SUV. 10-year warranty."}},
+  {id:'carnival',name:'2026 Kia Carnival',year:2026,type:['minivan'],tagline:"The SUV-styled minivan — VIP cabin, 8 passengers, hybrid available",msrp:37500,msrp_top:51000,features:['tech','wireless','safety','leather','heated','3row','cargo','sound'],mpg:'22 mpg / hybrid available',seats:8,awd:false,thirdrow:true,isNew:false,whatsnew:'Hybrid variant now available. VIP Lounge seats. Best cargo room in class. 4 USB-C standard on upper trims.',coach:{budget:'No SUV at this price gives more space per dollar.',features:'VIP lounge seats, dual sunroofs, Bose, 4-zone climate available.',space:'Unmatched — 145 cu ft max cargo. Sliding doors.',fuel:'Hybrid adds meaningful efficiency.',style:"Looks like an SUV — the stigma doesn't apply here.",reliability:'Best warranty in class. 10-year / 100K.'}},
+  {id:'ev6',name:'2026 Kia EV6',year:2026,type:['electric','suv-small'],tagline:'Award-winning electric crossover — 800V fast charge, 310+ mile range',msrp:42900,msrp_top:58000,features:['tech','wireless','safety','leather','heated','ventilated','sound','awd','charging'],mpg:'310+ mi range (RWD)',seats:5,awd:true,thirdrow:false,isNew:false,whatsnew:'NACS port added — charges at Tesla Superchargers. 310+ mile range. V2L powers external devices.',coach:{budget:'Higher upfront cost offset by dramatically lower running costs. EV credits may apply.',features:'800V: 18 min 10-80% at 350kW charger. V2L powers job sites.',space:'Sporty proportions — ideal for 4 passengers.',fuel:'~$30/month electricity vs $150+ gas equivalent.',style:'World Car Design of the Year.',reliability:'World Car of the Year. Full warranty + EV battery coverage.'}},
+  {id:'ev9',name:'2026 Kia EV9',year:2026,type:['electric','suv-3row'],tagline:'Premium 3-row electric SUV — 304-mile range, 576hp GT, V2L home power',msrp:56545,msrp_top:78000,features:['tech','wireless','safety','leather','heated','ventilated','3row','cargo','awd','charging','sound','hud'],mpg:'295-304 mi range',seats:7,awd:true,thirdrow:true,isNew:false,whatsnew:'GT variant: 576hp, 0-60 in 4.3s. 800V charging. V2L home-power up to 3.6kW. Nightfall Edition.',coach:{budget:'EV credit may reduce by $7,500. Zero gas costs.',features:'Everything Kia offers — 5-zone climate, Bose, HUD.',space:'More interior space than most gas 3-row SUVs. Adults fit 3rd row.',fuel:'$0 gas. 295-304 mile range.',style:'Turns more heads than luxury brands at the same price.',reliability:"KBB #2 Best Electric SUV. Full EV battery warranty."}}
+];
+
+const FEAT={awd:'AWD',tech:'Large Touchscreen',wireless:'Wireless CarPlay',safety:'Driver Assist',leather:'Premium Interior',heated:'Heated Seats',ventilated:'Ventilated Seats',sound:'Premium Sound',hud:'HUD',cargo:'Max Cargo','3row':'3rd Row',towing:'Towing',charging:'EV Charging',sunroof:'Sunroof',offroad:'Off-Road'};
+const PRIL={budget:'Budget / Payment',features:'Features & Tech',space:'Space',fuel:'Fuel Efficiency',style:'Style',reliability:'Reliability'};
+
+function updateCredit(v){
+  document.getElementById('credit-val').textContent=v;
+  const t={1:'Challenged',2:'Challenged',3:'Rebuilding',4:'Fair',5:'Good',6:'Very Good',7:'Excellent',8:'Excellent'};
+  const bg={1:'#ffe3e3',2:'#ffe3e3',3:'#fff3cd',4:'#fff3cd',5:'#fff3cd',6:'#d4edda',7:'#d4edda',8:'#d4edda'};
+  const tc={1:'#721c24',2:'#721c24',3:'#856404',4:'#856404',5:'#856404',6:'#155724',7:'#155724',8:'#155724'};
+  const el=document.getElementById('credit-tier');
+  el.textContent=t[v];el.style.background=bg[v];el.style.color=tc[v];S.credit=parseInt(v);
+}
+function toggleChoice(el,g){
+  el.classList.toggle('sel');
+  const arr=g==='type'?S.types:S.uses;
+  const v=el.dataset.val,i=arr.indexOf(v);
+  if(i>-1)arr.splice(i,1);else arr.push(v);
+}
+function single(el){
+  document.querySelectorAll('#pass-grid .choice-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');S.passengers=el.dataset.val;
+}
+function toggleTag(el,g){
+  el.classList.toggle('sel');
+  const arr=g==='must'?S.mustHave:g==='nice'?S.niceToHave:S.canGiveUp;
+  const v=el.dataset.val,i=arr.indexOf(v);
+  if(i>-1)arr.splice(i,1);else arr.push(v);
+}
+function selectPri(el){
+  const val=el.dataset.val,i=S.priorities.indexOf(val);
+  if(i>-1){
+    S.priorities.splice(i,1);el.classList.remove('sel');
+    el.querySelector('.pr-rank').textContent='—';
+    S.priorities.forEach((p,idx)=>{
+      const c=document.querySelector('#priority-list [data-val="'+p+'"]');
+      if(c)c.querySelector('.pr-rank').textContent=idx+1;
+    });
+  } else if(S.priorities.length<3){
+    S.priorities.push(val);el.classList.add('sel');
+    el.querySelector('.pr-rank').textContent=S.priorities.length;
+  }
+}
+function collectAll(){
+  S.fname=document.getElementById('c-fname').value;
+  S.lname=document.getElementById('c-lname').value;
+  S.phone=document.getElementById('c-phone').value;
+  S.email=document.getElementById('c-email').value;
+  S.address=document.getElementById('c-address').value;
+  S.credit=parseInt(document.getElementById('credit-slider').value);
+  S.cvYear=document.getElementById('cv-year').value;
+  S.cvMake=document.getElementById('cv-make').value;
+  S.cvModel=document.getElementById('cv-model').value;
+  S.cvMiles=document.getElementById('cv-miles').value;
+  S.cvLike=document.getElementById('cv-like').value;
+  S.cvHate=document.getElementById('cv-hate').value;
+  for(let i=0;i<=4;i++){const e=document.getElementById('notes-'+i);if(e)S.notes[i]=e.value;}
+}
+function goNext(){
+  collectAll();
+  if(S.step<4){
+    document.getElementById('step-'+S.step).classList.remove('active');
+    S.step++;
+    document.getElementById('step-'+S.step).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    updateNav();
+    if(S.step===4)buildResults();
+  } else {
+    collectAll();buildSummary();
+    document.querySelectorAll('#screen-guest .step-panel').forEach(p=>p.style.display='none');
+    document.getElementById('summary-section').style.display='block';
+        document.querySelector('.progress-wrap').style.display='none';
+    document.getElementById('hdr-right').textContent='Summary';
+  }
+}
+function goBack(){
+  if(S.step>0){
+    document.getElementById('step-'+S.step).classList.remove('active');
+    S.step--;
+    document.getElementById('step-'+S.step).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    updateNav();
+  }
+}
+function updateNav(){
+  document.getElementById('btn-back').style.visibility=S.step===0?'hidden':'visible';
+  document.getElementById('btn-next').textContent=S.step===4?'View Summary →':'Continue →';
+  document.getElementById('nav-step-info').textContent='Step '+(S.step+1)+' of 5';
+  document.getElementById('hdr-right').textContent='Step '+(S.step+1)+' of 5';
+  for(let i=0;i<5;i++){
+    const ps=document.getElementById('ps'+i);
+    ps.className='progress-step';
+    if(i<S.step)ps.classList.add('done');
+    else if(i===S.step)ps.classList.add('active');
+  }
+}
+function scoreV(v){
+  let s=0;
+  const types=S.types.includes('opentoall')||!S.types.length?['suv-small','suv-mid','suv-3row','sedan','hatchback','minivan','electric','hybrid']:S.types;
+  if(!types.some(t=>v.type.includes(t)))return -999;
+  for(const m of S.mustHave){if(m==='awd'&&!v.awd)return -999;if(m==='3row'&&!v.thirdrow)return -999;if(m==='charging'&&!v.features.includes('charging'))return -999;}
+  if(S.passengers==='5+'&&v.seats<6)s-=25;
+  [...S.mustHave,...S.niceToHave].forEach(f=>{if(v.features.includes(f))s+=12;});
+  S.mustHave.forEach(f=>{if(v.features.includes(f))s+=15;});
+  if(S.priorities.includes('budget')||S.priorities[0]==='budget'){if(v.msrp<30000)s+=22;else if(v.msrp<42000)s+=10;}
+  if(S.priorities.includes('fuel')&&(v.type.includes('hybrid')||v.type.includes('electric')))s+=22;
+  if(S.priorities.includes('space')&&v.thirdrow)s+=18;
+  if(S.priorities.includes('reliability'))s+=10;
+  if(v.isNew)s+=5;
+  if(S.credit<=3&&v.msrp>40000)s-=20;
+  if(S.credit<=5&&v.msrp>55000)s-=30;
+  return s;
+}
+function buildResults(){
+  const scored=VEHICLES.map(v=>({...v,score:scoreV(v)})).filter(v=>v.score>-999).sort((a,b)=>b.score-a.score).slice(0,3);
+  const area=document.getElementById('results-area');
+  const wants=[...S.mustHave,...S.niceToHave];
+  const top1=S.priorities[0]||'features';
+  const budgetFocus=S.priorities.includes('budget');
+  if(!scored.length){area.innerHTML='<div class="card"><p style="color:var(--muted)">No exact match — let\'s review selections together.</p></div>';return;}
+  area.innerHTML=scored.map((v,i)=>{
+    const isTop=i===0;
+    const ck=budgetFocus?'budget':(top1 in v.coach?top1:'features');
+    let giveupNote='';
+    if(budgetFocus&&S.canGiveUp.length){
+      const gl={leather:'leather interior',sunroof:'the sunroof',awd:'AWD',sound:'premium sound',hud:'the HUD',ventilated:'ventilated seats',tech:'the larger screen',heated:'heated steering wheel',color:'color preference'};
+      giveupNote=' Since you mentioned you could live without <em>'+S.canGiveUp.map(g=>gl[g]||g).join(', ')+'</em>, we have room to work with.';
+    }
+    return `<div class="result-card ${isTop?'top':''}">
+      <div class="result-badge ${isTop?'top':'alt'}">${isTop?' Best Match':i===1?'▲ Strong Alternative':'● Also Consider'}</div>
+      <div class="result-name">${v.name}${v.isNew?'<span class="new-badge">NEW</span>':''}</div>
+      <div class="result-tagline">${v.tagline}</div>
+      <div class="pill-row">${v.features.map(f=>`<span class="pill ${wants.includes(f)?'match':''}">${FEAT[f]||f}</span>`).join('')}<span class="pill">${v.mpg}</span><span class="pill">${v.seats} seats</span>${v.awd?'<span class="pill match">AWD Avail</span>':''}</div>
+      <div class="info-box"><strong>What's new:</strong> ${v.whatsnew}</div>
+      ${v.coach[ck]?`<div class="coach-box"><strong>${PRIL[ck]||ck}:</strong> ${v.coach[ck]}${giveupNote}</div>`:''}
+    </div>`;
+  }).join('');
+}
+function buildSummary(){
+  const scored=VEHICLES.map(v=>({...v,score:scoreV(v)})).filter(v=>v.score>-999).sort((a,b)=>b.score-a.score).slice(0,3);
+  const ct={1:'Challenged(1)',2:'Challenged(2)',3:'Rebuilding(3)',4:'Fair(4)',5:'Good(5)',6:'Very Good(6)',7:'Excellent(7)',8:'Excellent(8)'};
+  const now=new Date();
+  const ds=now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const ts=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  const fn=[S.fname,S.lname].filter(Boolean).join(' ')||'Guest';
+  let h=`<div class="sum-header"><div><div class="sum-brand"><span>KIA</span> Needs Analysis</div><div style="font-size:13px;color:var(--muted);margin-top:4px">Vehicle Finder — Customer Worksheet</div></div><div class="sum-date"><div style="font-size:15px;font-weight:600">${ds}</div><div>${ts}</div></div></div>`;
+  h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div>`;
+  h+=`<div class="sum-section"><div class="sum-section-title">Client Information</div>`;
+  h+=`<div class="sum-row"><span class="key">Name</span><span class="val">${fn}</span></div>`;
+  if(S.phone)h+=`<div class="sum-row"><span class="key">Phone</span><span class="val">${S.phone}</span></div>`;
+  if(S.email)h+=`<div class="sum-row"><span class="key">Email</span><span class="val">${S.email}</span></div>`;
+  if(S.address)h+=`<div class="sum-row"><span class="key">Address</span><span class="val">${S.address}</span></div>`;
+  h+=`<div class="sum-row"><span class="key">Credit Band</span><span class="val">${ct[S.credit]||S.credit}</span></div></div>`;
+  h+=`<div class="sum-section"><div class="sum-section-title">Current Vehicle</div>`;
+  if(S.cvYear||S.cvMake||S.cvModel)h+=`<div class="sum-row"><span class="key">Vehicle</span><span class="val">${[S.cvYear,S.cvMake,S.cvModel].filter(Boolean).join(' ')}</span></div>`;
+  if(S.cvMiles)h+=`<div class="sum-row"><span class="key">Mileage</span><span class="val">${S.cvMiles}</span></div>`;
+  if(S.cvLike)h+=`<div class="sum-row"><span class="key">Likes</span><span class="val">${S.cvLike}</span></div>`;
+  if(S.cvHate)h+=`<div class="sum-row"><span class="key">Leaving behind</span><span class="val">${S.cvHate}</span></div>`;
+  h+=`</div></div><div><div class="sum-section"><div class="sum-section-title">Vehicle Preferences</div>`;
+  if(S.types.length)h+=`<div class="sum-row"><span class="key">Type</span><span class="val">${S.types.join(', ')}</span></div>`;
+  if(S.passengers)h+=`<div class="sum-row"><span class="key">Passengers</span><span class="val">${S.passengers}</span></div>`;
+  if(S.mustHave.length)h+=`<div class="sum-row"><span class="key">Must have</span><span class="val">${S.mustHave.map(f=>FEAT[f]||f).join(', ')}</span></div>`;
+  if(S.niceToHave.length)h+=`<div class="sum-row"><span class="key">Nice to have</span><span class="val">${S.niceToHave.map(f=>FEAT[f]||f).join(', ')}</span></div>`;
+  if(S.priorities.length)h+=`<div class="sum-row"><span class="key">Top priorities</span><span class="val">${S.priorities.map((p,i)=>`${i+1}. ${PRIL[p]||p}`).join('<br>')}</span></div>`;
+  h+=`</div></div></div>`;
+  h+=`<div class="sum-section"><div class="sum-section-title">Recommended Vehicles</div>`;
+  scored.forEach((v,i)=>{
+    const badge=i===0?' Best Match':i===1?'▲ Alternative':'● Also Consider';
+    h+=`<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0"><div style="font-size:11px;font-weight:700;color:${i===0?'var(--red)':'var(--muted)'};min-width:90px;padding-top:2px">${badge}</div><div><div class="sum-match-name">${v.name}</div><div class="sum-match-sub">${v.tagline}</div></div></div>`;
+  });
+  h+='</div>';
+  const nl=['Client Info Notes','Vehicle Type Notes','Must-Have Notes','Priority Notes','Closing Notes'];
+  const hasN=S.notes.some(n=>n&&n.trim());
+  if(hasN){
+    h+='<div class="sum-section"><div class="sum-section-title">Sales Rep Notes</div>';
+    S.notes.forEach((n,i)=>{if(n&&n.trim())h+=`<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${nl[i]}</div><div class="sum-notes">${n.replace(/\n/g,'<br>')}</div></div>`;});
+    h+='</div>';
+  }
+  h+=`<div class="sum-footer">Kia Vehicle Finder — Internal Sales Tool | Generated ${ds} at ${ts}</div>`;
+  document.getElementById('summary-paper').innerHTML=h;
+}
+function downloadSummary(){
+  const html=document.getElementById('summary-paper').innerHTML;
+  const fn=[S.fname,S.lname].filter(Boolean).join('_')||'Client';
+  const ds=new Date().toISOString().slice(0,10);
+  const doc=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Kia Needs Analysis</title><link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;padding:32px;color:#1a1a1a;max-width:800px;margin:0 auto}.sum-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid #1a1a1a}.sum-brand{font-family:"Barlow Condensed",sans-serif;font-size:28px;font-weight:700}.sum-brand span{color:#CC0000}.sum-section{margin-bottom:22px}.sum-section-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#CC0000;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #ffdddd}.sum-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px}.sum-row .key{color:#888;font-weight:500}.sum-row .val{font-weight:600;text-align:right;max-width:60%}.sum-notes{background:#f4f4f4;border-radius:8px;padding:12px;font-size:13px;color:#555;line-height:1.6;font-style:italic}.sum-match-name{font-family:"Barlow Condensed",sans-serif;font-size:18px;font-weight:700}.sum-match-sub{font-size:12px;color:#888}.sum-date{font-size:12px;color:#888;text-align:right}.sum-footer{text-align:center;font-size:11px;color:#888;margin-top:24px;padding-top:16px;border-top:1px solid #ddd}
+/* ── MOBILE ── */
+
+
+
+
+/* ══════════════════════════════════════════
+   MOBILE — max-width 768px
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Header */
+  .site-header { padding: 0 16px; height: 52px; }
+  .hdr-right { display: none; }
+  .site-wordmark { font-size: 13px; letter-spacing: 2px; }
+
+  /* Layout: stack sidebar behind overlay, content full-width */
+  .kb-layout { grid-template-columns: 1fr; position: relative; }
+
+  /* Sidebar: fixed drawer, slides in from left */
+  .kb-sidebar {
+    position: fixed;
+    top: 52px; left: 0; bottom: 60px;
+    width: 272px; z-index: 300;
+    transform: translateX(-100%);
+    transition: transform 0.22s cubic-bezier(0.4,0,0.2,1);
+    height: auto;
+    box-shadow: none;
+  }
+  .kb-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 8px 0 32px rgba(0,0,0,0.7);
+  }
+
+  /* Overlay behind open sidebar */
+  .kb-overlay {
+    display: none;
+    position: fixed; top: 52px; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 299;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+  .kb-overlay.active { display: block; }
+
+  /* Content area */
+  .kb-content {
+    padding: 20px 14px 80px;
+    min-height: calc(100vh - 52px);
+  }
+
+  /* Model header */
+  .kb-model-title { font-size: 28px; }
+  .kb-model-tagline { font-size: 12px; }
+  .kb-meta-row { gap: 5px; }
+  .kb-meta-pill { font-size: 9px; padding: 4px 9px; }
+
+  /* Trim tabs — scrollable */
+  .trim-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
+  .trim-tab { padding: 10px 14px; font-size: 10px; flex-shrink: 0; }
+
+  /* Trim grid: stack to single column */
+  .trim-grid { grid-template-columns: 1fr; gap: 12px; }
+
+  /* Trim name */
+  .trim-name-big { font-size: 22px; }
+  .trim-price-big { font-size: 30px; }
+
+  /* Selling points */
+  .selling-points li { font-size: 12px; }
+  .selling-points li.feat-highlight span { font-size: 12px; }
+  .feat-tag { font-size: 8px; }
+  .upgrade-label { font-size: 8px; }
+
+  /* Overview */
+  .overview-box { font-size: 12px; }
+
+  /* Objections */
+  .obj-q { font-size: 12px; }
+  .obj-a { font-size: 12px; }
+
+  /* Search */
+  .search-model-card { padding: 14px; }
+  .search-card-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .search-trim-row { flex-direction: column; gap: 4px; }
+  .search-trim-name { min-width: unset; }
+  .search-results-title { font-size: 22px; }
+  .search-empty { padding: 40px 12px; }
+
+  /* Welcome */
+  .kb-welcome h2 { font-size: 20px; }
+  .kb-welcome p { font-size: 12px; }
+
+  /* Push screen content above bottom nav */
+  #screen-kb { padding-bottom: 0; }
+
+  /* Bottom nav bar */
+  .mobile-nav-bar {
+    display: flex;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 290;
+    background: var(--ink-90);
+    border-top: 1px solid var(--glass-border);
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    gap: 8px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+  }
+  .mobile-menu-btn, .mobile-search-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    gap: 6px; padding: 10px;
+    border-radius: var(--radius); cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-menu-btn {
+    background: var(--kia-red); border: none; color: white;
+    box-shadow: 0 0 12px var(--kia-red-glow);
+  }
+  .mobile-search-btn {
+    background: transparent; border: 1px solid var(--glass-border-bright);
+    color: var(--text-secondary);
+  }
+  .mobile-menu-btn svg, .mobile-search-btn svg { flex-shrink: 0; }
+
+}
+
+/* Desktop: hide mobile-only elements */
+@media (min-width: 769px) {
+  .mobile-nav-bar { display: none !important; }
+  .kb-overlay { display: none !important; }
+}
+
+</style></head><body>${html}</body></html>`;
+  const blob=new Blob([doc],{type:'text/html'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`Kia_Needs_Analysis_${fn}_${ds}.html`;a.click();
+}
+
+// ===== KNOWLEDGE BASE =====
+const KB={
+  k4:{name:'2026 Kia K4',tagline:'Sharp, tech-forward compact — bold style at an entry price',range:'$24,990 – $28,500',mpg:'35 mpg',seats:5,awd:false,badge:'COMPACT',isNew:false,
+    overview:'The K4 replaces the Forte and makes Kia a genuine style leader in the compact segment. Available as sedan or hatchback, it packs features that feel two classes up at every price point.',
+    trims:[
+      {name:'LX',price:'$24,990',tag:"The entry that doesn't feel like one",
+       pts:['12.3" dual touchscreen + digital cluster — standard, not a paid upgrade','Wireless Apple CarPlay & Android Auto across every trim','Standard forward collision avoidance, lane keep, and driver attention warning','35 mpg combined — strong efficiency without a hybrid system','Bold X-shaped DRL lighting, available two-tone exterior colors','Kia 5yr/60K basic + 10yr/100K powertrain — best in the compact class'],
+       talk:'The LX is where customers realize Kia is different now. 12.3" wireless CarPlay at $24,990 — competitors charge $2K extra. Start with the screen.'},
+      {name:'EX',price:'$26,500',tag:'Heated seats, leatherette, upgraded safety',
+       pts:['NEW: Heated front seats — comfort they notice every single morning','NEW: Leatherette seating surfaces — premium feel without premium pricing','Upgraded 6-speaker audio, noticeably better sound quality','Blind spot collision warning and rear cross-traffic alert added','Wireless phone charging pad standard — no cable clutter','Available panoramic sunroof on this trim'],
+       talk:'Once they feel the heated leatherette seats, the $1,500 over LX explains itself. The EX is your volume trim.'},
+      {name:'GT-Line',price:'$27,200',tag:'Sport styling, no sport premium',
+       pts:['Sportier exterior — 18" alloys, body-color accents, unique badging','GT-Line interior with sport bolstering and contrast red stitching','NEW: 1.6T turbocharged engine — 195 lb-ft of torque','Sport-tuned suspension for a more connected, responsive feel','NEW: Panoramic sunroof available — strong emotional closing feature','Most popular K4 trim — dealers move these fast'],
+       talk:'Tell them it drives as sharp as it looks. The GT-Line is aspirational at a practical price — customers feel like they got away with something.'},
+      {name:'GT-Line Turbo',price:'$28,500',tag:'Performance compact, fully loaded',
+       pts:['NEW: 190hp 8-speed dual-clutch — biggest power jump in the lineup','0-60 in under 7 seconds — legitimately fast for the class','NEW: Bose premium 7-speaker audio system','NEW: Ventilated front seats — essential in hot climates','Available panoramic sunroof on top package','Fully loaded appearance well under $30K — the closer'],
+       talk:'Under $30K, turbo engine, Bose, ventilated seats. If they test drive this one, you are closing today. Period.'}
+    ],
+    objs:[
+      {q:"I've never heard of the K4",a:"It replaced the Forte — one of our best sellers for years. Same reliability, completely redesigned. The 12.3\" screen standard at base is what gets people every time. Competitors charge $2K for that upgrade."},
+      {q:"Is Kia really reliable?",a:"The K4 is on a brand-new platform with zero relation to the older engines that had issues. It comes with a 10-year/100K powertrain warranty — we only offer that because we're confident backing it."},
+      {q:"I was thinking about a Civic or Corolla",a:"Both great choices. Quick question — does either of those include wireless CarPlay standard across every trim at base price? The K4 does. Just take it for a 20-minute drive and compare notes after."}
+    ]},
+  k5:{name:'2026 Kia K5',tagline:'Sporty mid-size sedan with AWD — rare, performance-forward, and bold',range:'$27,290 – $37,000',mpg:'32 mpg',seats:5,awd:true,badge:'MID-SIZE SEDAN',isNew:false,
+    overview:"The K5 is one of the most underrated mid-size sedans available. It offers AWD — something competitors charge luxury prices for — and a GT trim with 290hp. It punches two classes above its sticker.",
+    trims:[
+      {name:'LXS',price:'$27,290',tag:'AWD mid-size under $28K — nobody else does this',
+       pts:['Available AWD — the only mid-size sedan under $35K to offer it','12.3" HD touchscreen standard across all K5 trims','Heated front seats standard on every trim','Standard forward collision avoidance, lane keep, blind spot warning','Wireless CarPlay / Android Auto — no dongle required','32 mpg combined — efficient for the size'],
+       talk:'Lead with AWD at this price. Nobody else does it. The Camry and Accord do not offer AWD at any price point. Full stop.'},
+      {name:'EX',price:'$29,900',tag:'Comfort meets feature density',
+       pts:['NEW: Leatherette seating with contrast stitching throughout','NEW: Power driver seat with lumbar support','NEW: Dual-zone automatic climate — driver and passenger independent','Surround view monitor available for tight city parking','Smart key and push-button start standard','Rear USB-C charging ports — family road trips covered'],
+       talk:'The EX starts feeling genuinely luxurious. Power seat, dual-zone climate, leatherette in the low $30s. Hard combination to beat anywhere near this price.'},
+      {name:'GT-Line',price:'$32,500',tag:'Sport look, sport tuning, practical price',
+       pts:['Sportier 19" wheels and unique GT-Line exterior treatment','Sport-tuned suspension — sharper handling than base trims','NEW: Panoramic sunroof available — strongest emotional close in the lineup','1.6T turbocharged engine option — 180hp, 8-speed auto','Available Bose premium 8-speaker audio','Unique interior color options with sport-bolstered seats'],
+       talk:'Show the GT-Line next to a base Camry. The K5 looks like a $50K car. The visual difference alone usually does the selling.'},
+      {name:'GT',price:'$37,000',tag:'290hp twin-scroll turbo — the performance sedan',
+       pts:['NEW: 290hp twin-scroll turbo — 0-60 in 5.8s, sports car territory','Standard AWD on the GT — handles power perfectly','0-60 in 5.8 seconds — sports car territory at a mainstream price','NEW: Brembo brakes — stops as hard as it goes','NEW: Nappa leather + ventilated seats — front AND rear','Competes directly with Genesis G70 at $10K less'],
+       talk:'The GT is your secret weapon for performance buyers. Camry and Accord cannot touch 290hp AWD. This competes with the Genesis G70 — at $10,000 less.'}
+    ],
+    objs:[
+      {q:"Why not just get a Camry?",a:"The Camry is excellent — but it doesn't offer AWD at any price. The K5 does. And the K5 GT has 290hp versus the Camry's 203. We're just asking you to drive both and tell us which feels more exciting."},
+      {q:"Kia resale isn't as strong",a:"That gap has been closing fast. KBB ranks Kia above average on residual. And the 10-year/100K warranty often makes total cost of ownership lower than competitors with 'better' resale."},
+      {q:"Not sure about Kia quality",a:"Kia and Hyundai share engineering with Genesis — their luxury brand. The K5 platform is used in multiple luxury-tier vehicles. Happy to set up a 30-minute test drive — that usually answers the question."}
+    ]},
+  seltos:{name:'2026/2027 Kia Seltos',tagline:'Subcompact SUV with a big personality — and the 2027 is a complete reinvention',range:'$25,285 – $33,000',mpg:'31 mpg / 38 mpg hybrid (2027)',seats:5,awd:true,badge:'SMALL SUV',isNew:true,
+    overview:'The 2026 Seltos is a strong value buy, and the 2027 is a complete redesign inspired by the Telluride with the first-ever hybrid option. Two model years means potential clearance deals on 2026 inventory.',
+    trims:[
+      {name:'LX (2026)',price:'$25,285',tag:'No-nonsense entry SUV with solid tech',
+       pts:['AWD available — all-weather confidence most compact buyers want','10.25" touchscreen with wireless CarPlay — above average for this price','Standard forward collision avoidance, pedestrian detection, lane assist','31 mpg combined keeps fuel costs low','2026 outgoing model may have additional dealer incentives','Kia 10-year/100K warranty — separates it from every competitor'],
+       talk:'Price-sensitive customer who wants AWD under $30K with solid tech? The 2026 Seltos LX is hard to argue with — especially with potential clearance pricing.'},
+      {name:'EX (2026)',price:'$28,500',tag:'The sweet spot — heated seats, panoramic roof',
+       pts:['Heated front seats — mention this in warm climates too; customers love comfort','NEW: Panoramic sunroof available — closes deals','NEW: Leatherette seating surfaces','Blind spot warning and rear cross-traffic alert','Dual-zone climate control — driver and passenger comfort','Available in exclusive two-tone color combinations'],
+       talk:'The Seltos EX with the panoramic roof is a showstopper. Most customers assume they\'re looking at a $35K vehicle. Then you show them the sticker.'},
+      {name:'SX (2026)',price:'$32,000',tag:'Fully loaded — everything the Seltos offers',
+       pts:['NEW: Bose premium audio — big step up in sound quality','NEW: Power driver seat with memory function','NEW: Highway Driving Assist — semi-autonomous highway mode','NEW: Ventilated front seats — essential for hot climates','Smart parking assist available','Last chance at this generation — potential final-build collector value'],
+       talk:'Position the SX as the fully-loaded farewell to a generation. Customers who want everything the 2026 offers often respond well to that framing.'},
+      {name:'Base (2027)',price:'$25,500',tag:"All-new Telluride-inspired look — same value entry",
+       pts:['Completely new exterior inspired by the Telluride — dramatic visual upgrade','Larger body — more rear legroom and cargo than outgoing model','360-degree surround view camera now available on base trims','Updated 12.3" touchscreen with new UX interface','Standard wireless CarPlay and Android Auto','Memory driver seat standard — previously upper-trim only'],
+       talk:'The 2027 looks like a $40K vehicle. Pull it up next to the old one and watch their reaction. That visual delta alone drives trade-up decisions.'},
+      {name:'Hybrid (2027)',price:'$30,000',tag:'First-ever Seltos hybrid — efficiency meets reinvention',
+       pts:['NEW: First-ever Seltos hybrid — ~38 mpg combined','Annual fuel savings of $800-1,200 vs comparable non-hybrid competitors','AWD standard on the Hybrid trim — no compromise for efficiency','Same bold 2027 exterior as gas models','Government fuel efficiency incentives may apply','Class-leading MPG in the subcompact SUV segment'],
+       talk:'The 2027 Seltos Hybrid is your closer for under-$35K AWD hybrid buyers. 38 mpg AWD hybrid — there is no competitor at this price point. None.'}
+    ],
+    objs:[
+      {q:"It's too small for my family",a:"The 2027 grew in every dimension — more rear legroom, more cargo, taller roofline. If you need more, the Sportage is right above it in price. I'd love to show you both and let you decide."},
+      {q:"I'll wait for the 2027",a:"Smart. Or — we can get you into the 2026 with potential clearance pricing. Your monthly payment will be meaningfully lower. What's your timeline look like?"},
+      {q:"Why not just get the Sportage?",a:"Good question — I'd actually love to show you both. Sportage has more cargo and a slightly larger body. Seltos is easier to park and often lower insurance. Let the features decide."}
+    ]},
+  niro:{name:'2026 Kia Niro',tagline:'One nameplate, three powertrains — the efficiency champion of the Kia lineup',range:'$28,550 – $40,000',mpg:'53 mpg HEV | 33mi EV (PHEV) | 253mi (EV)',seats:5,awd:false,badge:'HYBRID / EV',isNew:false,
+    overview:'The Niro is unique: available as traditional hybrid, plug-in hybrid, or full battery electric. Perfect for customers who want maximum fuel savings. 2027 may transition to EV3 branding — current stock may be a last-generation opportunity.',
+    trims:[
+      {name:'Niro Hybrid LX',price:'$28,550',tag:'53 mpg entry — lowest cost to own in the lineup',
+       pts:['53 mpg combined — highest non-EV fuel economy in the entire Kia lineup','Saves $1,200-1,500/year vs comparable gas-only vehicles','1.6L hybrid system — proven reliability over multiple generations','Standard 10.25" touchscreen with wireless CarPlay','Standard forward collision avoidance and lane assist','Full-size hatchback with excellent cargo flexibility — no compromises'],
+       talk:'If a customer is budget-focused long-term, 53 mpg changes the math completely. Map out 5-year fuel cost vs a competitor and let the numbers close the deal.'},
+      {name:'Niro Hybrid EX',price:'$32,000',tag:'Comfort, efficiency, and full tech package',
+       pts:['HEV hybrid powertrain — 53 mpg combined','NEW: Leatherette seating + heated front seats','NEW: Built-in navigation added','Power driver seat — daily quality-of-life upgrade','Blind spot collision warning added to safety suite','Available Bose premium audio','Dual-zone automatic climate control'],
+       talk:'The Niro EX looks and feels premium, drives efficiently, and has 5-year running costs well below any competitor. That combination is genuinely hard to walk away from.'},
+      {name:'Niro PHEV',price:'$35,500',tag:'Plug-in hybrid — EV for commutes, gas for everything else',
+       pts:['Plug-in hybrid (PHEV) — 33-mile EV-only range, then runs as standard hybrid','Full charge in ~2.5 hours on Level 2 home charger','Runs as a standard hybrid once battery depletes — zero range anxiety','Federal and state tax incentives may apply — check current eligibility','Real-world: many owners go weeks without visiting a gas station','Best of both worlds for customers not ready to go full EV'],
+       talk:'For customers on the EV fence, the PHEV is the perfect bridge. Run on electricity to work every day. Don\'t think about gas for weeks. Road trip on the weekend with zero anxiety.'},
+      {name:'Niro EV',price:'$40,000',tag:'Fully electric — 253-mile range, zero compromises',
+       pts:['NEW: 253-mile full EV range — no gas, ever','DC fast charging capability — 80% in under 45 minutes','Vehicle-to-Load (V2L) — power devices or tools from the car','Potential federal EV tax credit up to $7,500 may apply','Heat pump standard — maintains range in cold weather','Zero tailpipe emissions with additional state incentives in many markets'],
+       talk:'With the tax credit, the Niro EV is often under $33K effective. Walk them through monthly electricity vs gas: usually $80-100 per month in savings, every single month.'}
+    ],
+    objs:[
+      {q:"I don't want to worry about charging",a:"The hybrid never gets plugged in — it charges itself. The PHEV lets you plug in at home but runs on gas if you don't. The EV has 253-mile range — covers 99% of days without a second thought."},
+      {q:"Hybrids are complicated and expensive to maintain",a:"Kia's hybrid system has been in production 8+ years with strong reliability data. Standard oil changes. No exotic maintenance. And lower fuel costs offset any modest premium."},
+      {q:"Will it be enough car?",a:"The Niro is a full hatchback crossover — more practical than a sedan. Folds rear seat for cargo. For 2-4 people with typical family use, it's right-sized with real fuel savings every day."}
+    ]},
+  sportage:{name:'2026 Kia Sportage',tagline:'12.3" screen on every single trim — Edmunds top-rated compact SUV',range:'$30,290 – $42,500',mpg:'26 mpg / 39 mpg hybrid',seats:5,awd:true,badge:'COMPACT SUV',isNew:false,
+    overview:"The Sportage is the most spec-for-spec dominant compact SUV in the segment. 12.3\" dual touchscreen standard everywhere — competitors charge $2,000+ for that. Edmunds rates it top in class. This is your confident, data-backed pitch.",
+    trims:[
+      {name:'LX',price:'$30,290',tag:"Most loaded 'base' in the compact SUV segment",
+       pts:["12.3\" dual touchscreen standard — no other base compact SUV matches this",'Wireless CarPlay and Android Auto — no dongle, no cable required','Standard Highway Driving Assist — hands-on semi-autonomous highway capability','Standard blind spot warning and rear cross-traffic alert','Available AWD — essential for wet-weather confidence','26 mpg combined — solid for a gas SUV'],
+       talk:"When they see '12.3-inch standard' they think you made a mistake. You didn't. Pull up a Chevy Equinox base next to the Sportage LX and let the spec sheet do the work."},
+      {name:'EX',price:'$34,000',tag:'Sweet spot — 70% of Sportage buyers land here',
+       pts:['NEW: Dual-level cargo floor — best cargo system in its class','NEW: Heated front AND rear seats — rear heated is rare at this price','NEW: Panoramic sunroof — strong emotional close','Power driver seat with lumbar support','Wireless charging pad for both front phones','Blind spot monitor with lane-change assist'],
+       talk:'Heated rear seats is the talking point that surprises people. Most competitors don\'t offer that until premium trims. The EX is the Sportage most buyers drive home.'},
+      {name:'SX-Prestige',price:'$38,000',tag:'Near-luxury spec at a mid-market price',
+       pts:['NEW: Bose 8-speaker premium audio','NEW: Heads-Up Display (HUD) — speed & nav on the windshield','NEW: Ventilated front seats — non-negotiable in Florida','Navigation with over-the-air map updates included','Smart power liftgate — hands-free trunk opening','Full leather with premium contrast stitching throughout'],
+       talk:'Position as the vehicle that blurs mainstream and luxury. Bose and HUD at $38K — a BMW X3 with those features starts at $55K. The math is easy.'},
+      {name:'Hybrid EX',price:'$37,000',tag:'39 mpg — best in the compact SUV segment',
+       pts:['NEW: 39 mpg combined — best in any compact SUV class','Saves ~$900-1,200/year vs the gas Sportage at average mileage','Same EX interior and cargo features — no compromise for efficiency','AWD available with hybrid system','Seamless powertrain — customers often forget they\'re in a hybrid','Proven Kia hybrid system with multi-year reliability track record'],
+       talk:'Do the math out loud: 39 vs 26 mpg over 15,000 miles is ~$900 savings. Over 5 years, nearly $5,000. The hybrid premium pays back fast — and that\'s the conversation.'},
+      {name:'PHEV',price:'$42,500',tag:'Plug-in hybrid — EV commuter, gas road-tripper',
+       pts:['NEW: 34-mile EV-only range — commute on electricity, road trip on gas','Qualifies for federal EV tax credits — verify current eligibility','Combined hybrid mode ~35 mpg when battery depletes','Level 2 home charging in under 2 hours','AWD standard on PHEV trim','Lowest cost-per-mile vehicle in the Sportage lineup for high-commute drivers','Leatherette seating with heated seats','Panoramic sunroof available'],
+       talk:'Customers who drive 20-40 miles daily: the PHEV pays for its premium in fuel savings within 3 years. With a tax credit, the effective price drops significantly. Show the math.'}
+    ],
+    objs:[
+      {q:"The RAV4 or CR-V is more reliable",a:"Both excellent. The Sportage earned an Edmunds Top Rated award and comes with a 10-year/100K warranty — longer than Toyota or Honda. If reliability is the core concern, our warranty protection is actually the strongest you can buy."},
+      {q:"I want AWD but don't want to spend more",a:"AWD is available on the base Sportage LX. You don't have to step up a trim to get it. Let's build that configuration and see where the payment lands."},
+      {q:"It feels a little small",a:"It's mid-segment. The dual-level cargo floor actually gives you more usable space than it looks. If family size is the concern, the Sorento right above it has a 3rd row at a similar entry price — I can show you both."}
+    ]},
+  sorento:{name:'2026 Kia Sorento',tagline:'Best-value 3-row SUV — 37 mpg hybrid, 5,000 lb tow, 10-year warranty',range:'$33,635 – $48,000',mpg:'26 mpg / 37 mpg hybrid',seats:7,awd:true,badge:'3-ROW MID-SIZE',isNew:false,
+    overview:'The Sorento is the value story of the Kia lineup. A 3-row SUV with hybrid availability, 5,000 lb tow rating, and top safety scores — at a price that undercuts every competitor by $5,000-10,000 for comparable spec.',
+    trims:[
+      {name:'LX',price:'$33,635',tag:'Entry 3-row — more value per dollar than any competitor',
+       pts:['3-row seating for 7 — rare at this entry price point','8" touchscreen with standard wireless CarPlay','Standard forward collision avoidance and lane assist','Available AWD — all-weather family confidence','5,000 lb tow rating — tows a boat or camper trailer','10yr/100K warranty — best in its class by a wide margin'],
+       talk:'At $33,635 with 3 rows and a tow rating, the Sorento LX starts the entire conversation. There is no other 3-row at this number with comparable safety or warranty.'},
+      {name:'S',price:'$36,500',tag:'Added comfort features that make a real difference',
+       pts:['NEW: Leatherette seating + heated front seats','Blind spot collision warning — peace of mind for lane changes','Rear USB charging ports — keeps the family charged in the 2nd row','Puddle lighting under mirrors — premium detail at this price','Available in additional exclusive exterior colors','Smart key with push-button start standard'],
+       talk:'The S is the "I didn\'t expect that" trim. Heated seats and leatherette in the mid-$30s on a 3-row. Punches well above its sticker.'},
+      {name:'EX',price:'$40,000',tag:'Fully featured family SUV at the $40K mark',
+       pts:['NEW: Panoramic sunroof — the emotional anchor for family buyers','Power driver seat with lumbar support for long drives','10.25" navigation touchscreen with real-time traffic','Smart power liftgate — opens hands-free when approaching with arms full','NEW: Ventilated front seats — Florida summer essential','Leatherette seating surfaces','NEW: 3-zone automatic climate — every row independent'],
+       talk:'Most customers don\'t expect ventilated seats and a panoramic-roof 3-row at this price. Show the EX next to a Ford Explorer at the same money — Sorento wins on spec every time.'},
+      {name:'Hybrid EX',price:'$43,000',tag:'37 mpg — the most efficient 3-row on the US market',
+       pts:['NEW: 37 mpg hybrid — best 3-row fuel economy in the US','Saves $1,200-1,500/year vs a comparable gas 3-row at average mileage','Identical interior space and cargo to the gas Sorento — no compromise','AWD standard on Hybrid — best combination for families in any climate','Smooth, seamless powertrain — imperceptible transition between modes','5-year cost savings of $6,000+ vs competitors with no hybrid option','Leatherette seating with heated front seats','Panoramic sunroof available'],
+       talk:'No other 3-row gets 37 mpg. That is the entire pitch. Map out annual fuel spend at 15,000 miles and the hybrid pays for its $3K premium in under 3 years.'},
+      {name:'SX Prestige',price:'$48,000',tag:'Near-luxury spec — the benchmark 3-row value story',
+       pts:['NEW: Nappa leather with ventilated 1st AND 2nd rows','NEW: Bose 10-speaker premium audio','NEW: Heads-Up Display (HUD)','NEW: Highway Driving Assist 2.0 — semi-autonomous highways','Remote smart parking assist — park without sitting in the car','Hyundai Palisade or Nissan Pathfinder with this spec costs $5-8K more'],
+       talk:'The SX Prestige is a $60K SUV experience for $48K. Lay the features next to a Highlander Platinum — the Sorento wins and undercuts it. Open and shut.'}
+    ],
+    objs:[
+      {q:"I was looking at the Telluride",a:"Great choice — the Telluride is our flagship. But the Sorento has the same 3rd row, same 5,000 lb tow rating, and a hybrid option the Telluride doesn't yet offer. If the budget matters at all, the Sorento gives 90% of the experience for meaningfully less."},
+      {q:"Is the third row usable?",a:"For kids and shorter trips for adults — absolutely. For longer trips with adult passengers, the Telluride or Carnival will be more comfortable. Want me to pull up the measurement comparison?"},
+      {q:"Honda Pilot or Toyota Highlander has better resale",a:"The gap has been closing every year. But consider: the Sorento is $5-8K less to start, has a longer warranty, and the hybrid version lowers your operating cost. Total cost of ownership often favors the Sorento."}
+    ]},
+  telluride:{name:'2027 Kia Telluride',tagline:'All-new redesign — KBB #1 rated 3-row SUV, bigger, bolder, now hybrid available',range:'$40,735 – $57,285',mpg:'21 mpg / hybrid coming',seats:8,awd:true,badge:'FLAGSHIP 3-ROW — ALL NEW',isNew:true,
+    overview:"The 2027 Telluride skipped a model year for a complete ground-up redesign. Bigger, bolder, boxier — adults fit in all three rows. KBB's #1 rated 3-row SUV. New hybrid option and X-Pro off-road variant available.",
+    trims:[
+      {name:'LX',price:'$40,735',tag:'The Telluride experience starts here',
+       pts:['Completely redesigned for 2027 — larger body, iconic boxier shape','8.0" touchscreen with standard wireless CarPlay and Android Auto','All three rows fit adults — class-leading 3rd row headroom','Available AWD with selectable drive modes','Standard safety suite: forward collision, blind spot, lane keep, rear cross-traffic',"KBB's #1 Best 3-Row SUV — even the base delivers that experience"],
+       talk:"Even the base Telluride turns heads in the parking lot. Pull it next to anything in this segment — the visual presence is in a different league. Lead with the redesign story."},
+      {name:'S',price:'$44,000',tag:'Luxury and technology across all rows',
+       pts:['10.25" touchscreen with built-in navigation','Leatherette seating with heated front and 2nd row seats','NEW: Panoramic sunroof front to 2nd row — stadium feel','NEW: Captain\'s chairs available — VIP second-row configuration','Power liftgate with height memory','Blind spot collision warning with lane-change assist'],
+       talk:'The panoramic sunroof in sunlight sells itself. The 2nd row captain\'s chairs flip the interior into a first-class cabin. Both are things customers talk about when they leave.'},
+      {name:'EX',price:'$48,000',tag:'Feature-dense family flagship',
+       pts:['NEW: Full leather across all three rows','NEW: Ventilated front seats','3-zone automatic climate — every zone independently controlled','NEW: Heads-Up Display (HUD)','Smart power liftgate with foot-activated sensor','Highway Driving Assist 2.0 — semi-autonomous highway capability'],
+       talk:'The Telluride EX is where the luxury angle becomes real. True leather across 3 rows, HUD, ventilated seats at $48K. A Chevy Traverse with this spec is $54K.'},
+      {name:'Hybrid',price:'$48,000',tag:'NEW: First-ever Telluride hybrid — efficiency without sacrifice',
+       pts:["First Telluride hybrid in the nameplate's history — major milestone",'Estimated 28-30 mpg combined — big improvement over gas-only 21 mpg','Same 8-passenger capacity — no compromise on space','AWD standard on hybrid trim','Annual fuel savings of $800-1,200 vs gas Telluride','Leatherette seating standard','Panoramic sunroof available','Same bold exterior and interior design — zero visual compromise'],
+       talk:"The hybrid Telluride is the answer to every customer who said 'I love it but the fuel economy held me back.' That objection is now officially gone."},
+      {name:'SX Prestige',price:'$54,000',tag:'Near-luxury, fully loaded — the flagship statement',
+       pts:['NEW: Full Nappa leather across all three rows','Bose 10-speaker premium audio — concert-quality sound','NEW: Massaging front seats — closes deals on contact','NEW: 5-zone climate — unprecedented in this segment','Remote smart parking assist — park without being in the vehicle','At $54K, competes with $65-75K import luxury SUVs on real features'],
+       talk:'When a customer activates the massaging seat, the conversation usually ends. Closing rate on SX Prestige test drives is exceptional. Get them in that seat.'},
+      {name:'X-Pro',price:'$57,285',tag:'Off-road capability with flagship luxury',
+       pts:['NEW: Locking rear differential — genuine off-road','X-Terrain mode with off-road-specific ABS and traction tuning','Skid plates protecting underbody on rough terrain','NEW: All-terrain tires standard — dirt, mud, gravel ready','All SX Prestige luxury features included — Nappa leather, panoramic sunroof','Most segment-unique trim in the 3-row class — nothing else offers this combination'],
+       talk:"The X-Pro is a conversation piece and a closer. Show them the skid plates. For the customer who 'goes to the lake every weekend,' this becomes a must-have identity purchase."}
+    ],
+    objs:[
+      {q:"The new Telluride looks too boxy",a:"Design is personal — fair enough. The new proportions were built around more interior space. Can I show you the inside first? Most people who see the cabin end up loving the exterior once they sit in it."},
+      {q:"What about a Sequoia or Tahoe?",a:"Those are full-size trucks on truck frames — they ride differently and park much harder. The Telluride outsells them on value per dollar and our 10-year warranty is 4 years longer than Ford or GM."},
+      {q:"The price jumped from the old model",a:"The 2027 is a completely new vehicle — every panel, platform, and feature is different. What you're comparing to is a fully redesigned machine, not just a refresh. The LX vs outgoing EX spec comparison tells the real story."}
+    ]},
+  carnival:{name:'2026 Kia Carnival',tagline:'The SUV-styled minivan — premium VIP cabin, 8 passengers, hybrid available',range:'$37,500 – $51,000',mpg:'22 mpg / hybrid available',seats:8,awd:false,badge:'PREMIUM MINIVAN',isNew:false,
+    overview:"The Carnival has done what no other minivan could — made the category aspirational. SUV-inspired exterior, available VIP lounge seats, and now a hybrid variant. Best cargo room in its segment. If a family needs space and won't be talked into an SUV, the Carnival closes itself.",
+    trims:[
+      {name:'LX',price:'$37,500',tag:'8 passengers, sliding doors, the family solution',
+       pts:['8-passenger seating with individual captain\'s chairs in the 2nd row','Power sliding side doors — convenience every parent appreciates','Best-in-class cargo: 145 cu ft max with all seats folded','Standard 8" touchscreen with wireless CarPlay','Standard forward collision, blind spot, rear cross-traffic suite','No competitor at this price offers a more practical family vehicle'],
+       talk:'For families with 3+ kids, the Carnival LX removes every pain point of SUV ownership. More cargo, easier loading, lower step-in height. And it doesn\'t look like the minivan people picture.'},
+      {name:'EX',price:'$42,000',tag:'Comfort meets family function',
+       pts:['NEW: Leather seating across all three rows','NEW: Heated + ventilated front seats','10.25" navigation touchscreen standard','Multi-zone climate: front, rear, and rear-rear independent','NEW: Panoramic dual sunroof — floods the entire cabin','Sliding doors with child safety lock — essential for families'],
+       talk:'The EX stops feeling like a practical choice and starts feeling like a decision customers are genuinely excited about. Leather, panoramic roof, climate zones — it\'s a premium family vehicle.'},
+      {name:'SX',price:'$46,000',tag:'VIP second row — premium everywhere',
+       pts:['NEW: VIP Lounge Package — 170° recline, footrest, power ottoman','NEW: Bose 12-speaker surround sound — best in class','2nd-row powered sliding door with sunshade','4-zone automatic climate including dedicated rear zone','Highway Driving Assist 2.0 — semi-autonomous highway operation','Smart parking assist and surround view monitor','Leather seating surfaces throughout','Panoramic dual sunroof available'],
+       talk:'If your customer has ever flown business class, show them the VIP Lounge Package. The 170° reclining seat with ottoman is a jaw-dropping moment. It closes without a word.'},
+      {name:'Hybrid',price:'$48,000',tag:'First hybrid Carnival — efficiency for high-mileage families',
+       pts:['NEW: First Carnival Hybrid — 30+ mpg, addresses top objection','Estimated 30+ mpg combined — meaningful jump over 22 mpg gas','Same 8-passenger capacity — no space compromise','Ideal for families doing 18,000+ miles/year — over $1,000/year savings','Federal alternative vehicle incentives may apply','Leather seating available','Same panoramic sunroof options as gas Carnival','Smooth, imperceptible hybrid transition — passengers never notice'],
+       talk:"Position this as the answer to 'I'd consider the Carnival but the fuel economy killed it.' That objection is now gone. The stigma objection never applied to this vehicle anyway."},
+      {name:'SX Prestige',price:'$51,000',tag:'The pinnacle — luxury family hauler',
+       pts:['Every SX feature plus VIP Lounge Package standard','NEW: Individual rear entertainment screens in 2nd row','The most feature-complete minivan at any price point','Power running boards — effortless step-assist for loading children','Full leather seating standard','Panoramic dual sunroof standard','Competes with Chrysler Pacifica Pinnacle at a lower effective price','Remote start with full climate pre-conditioning'],
+       talk:'The SX Prestige is your closer for the customer who needs convincing on the minivan category. Get them in the 2nd row and put it into full recline. The vehicle sells itself at that point.'}
+    ],
+    objs:[
+      {q:"I don't want a minivan — it's not my image",a:"I hear that constantly. Can I ask — what does your current SUV not do that you wish it did? Nine times out of ten the answer is 'more room' or 'easier loading.' The Carnival solves both. And most people driving by genuinely don't know it's a minivan."},
+      {q:"What about a 3-row SUV?",a:"Sorento or Telluride are both great. But let's compare: Carnival has 145 cu ft cargo vs 87 for the Telluride. Sliding doors. Lower floor. More seating flexibility. If you're truly hauling the whole family, the Carnival wins on function every time."},
+      {q:"The fuel economy bothers me",a:"The hybrid option directly addresses that. 30+ mpg in a vehicle this size — no other minivan or 3-row SUV offers that. Let's look at what monthly fuel savings look like vs your current vehicle."}
+    ]},
+  ev6:{name:'2026 Kia EV6',tagline:'Award-winning electric crossover — 800V fast charging, 310+ mile range',range:'$42,900 – $58,000',mpg:'Up to 310 mi range',seats:5,awd:true,badge:'ELECTRIC CROSSOVER',isNew:false,
+    overview:"The EV6 is Kia's most awarded vehicle ever — World Car of the Year, World Car Design of the Year. The 800V architecture means faster charging than almost anything on the road. Now with NACS port — full Tesla Supercharger network access.",
+    trims:[
+      {name:'Standard Range RWD',price:'$42,900',tag:'The EV6 entry — still fast, still stunning',
+       pts:['232-mile range — covers the vast majority of daily and weekly driving','Single motor RWD — 167hp, smooth and efficient','Standard 12.3" dual touchscreen + digital cluster','Standard safety suite: forward collision, lane assist, blind spot warning','NACS charging port — full access to Tesla Supercharger network','Federal EV tax credit may reduce effective price to ~$35,400'],
+       talk:'The Standard Range is the EV6 access point. For customers commuting under 100 miles daily and charging at home, 232 miles is more than they\'ll ever use. At the effective post-credit price — this is the value story.'},
+      {name:'Long Range RWD',price:'$47,000',tag:'310 miles — freedom from range anxiety',
+       pts:['NEW: 310-mile range — up from 232 miles on Standard Range','Leatherette seating with heated seats','Panoramic glass roof available','Heat pump standard — maintains range efficiency in cold weather','NEW: V2L — power laptops, tools, or gear from the car','NEW: 800V fast charge — 10-80% in just 18 minutes','Available Meridian premium audio','Available heated and ventilated front seats'],
+       talk:'The 18-minute 10-80% charge is the killer stat. Most competitors need 35-45 minutes. For road trippers, that\'s the difference between a coffee stop and a long wait.'},
+      {name:'Long Range AWD',price:'$51,000',tag:'Dual motor AWD — performance and range in one',
+       pts:['NEW: Dual-motor AWD — 320hp, 0-60 in 5.1s','274-mile range with AWD — barely any range penalty for the performance','AWD essential for wet markets or occasional light towing','Standard Meridian premium audio system','Heads-Up Display available','Quickest all-season daily driver in its price segment','Available panoramic glass roof','Leatherette seating standard'],
+       talk:'The AWD EV6 is for the customer who wants a sports car and an EV. 0-60 in 5.1 seconds with AWD traction. It feels genuinely fast every single time you put your foot down.'},
+      {name:'GT',price:'$58,000',tag:'576hp — the fastest Kia ever made',
+       pts:['NEW: 576hp — 0-60 in 3.4s, fastest Kia ever built','Track-capable with Electronic Limited Slip Differential (e-LSD)','NEW: Brembo brakes + GT sport suspension','Unique GT exterior with wider body, hood vents, 21" wheels','NEW: Nappa leather + Meridian audio — both standard','Fastest production Kia in history — a sports car that charges overnight'],
+       talk:'If a customer is debating between a sports car and a practical EV, the GT ends that debate. 3.4 seconds to 60 — faster than a Porsche Macan. And you charge it in your garage every night.'}
+    ],
+    objs:[
+      {q:"I'm worried about charging infrastructure",a:"The EV6 now has the NACS port — same as Tesla. That adds 17,000+ Superchargers to your network. Most EV6 owners charge 95% of the time at home. Full every morning, no stops needed."},
+      {q:"What about range in hot climates like Florida?",a:"Heat has far less effect on EV range than cold. Florida is actually one of the best climates for EV ownership. Range loss from heat is typically under 5% in ambient conditions."},
+      {q:"It's more expensive than I expected",a:"Before we anchor on sticker: federal tax credit of up to $7,500 may apply. No oil changes. Fuel at home at off-peak rates is often $25-35/month vs $150+ in gas. The 3-year running cost on the EV6 is typically equal to or lower than a comparable gas vehicle."}
+    ]},
+  ev9:{name:'2026 Kia EV9',tagline:'Premium 3-row electric SUV — 304-mile range, 576hp GT option, V2L home power',range:'$56,545 – $78,000',mpg:'295-304 mi range',seats:7,awd:true,badge:'ELECTRIC 3-ROW SUV',isNew:false,
+    overview:"The EV9 is Kia's most premium production vehicle and one of the most important EVs on the market. A 3-row SUV with real adult third-row seating, 800V fast charging, and V2L capability to power your home in an outage. KBB #2 Best Electric SUV.",
+    trims:[
+      {name:'Standard AWD',price:'$56,545',tag:'Full-size electric 3-row — the entry into the EV9 world',
+       pts:['295-mile range on standard AWD — covers all real-world family use','7-passenger seating with adult-usable third row','Standard 12.3" dual touchscreen + full digital cluster','V2L (Vehicle-to-Load): 3.6kW output — power devices or run lights in an outage','Federal EV tax credit up to $7,500 may apply — verify current eligibility','800V architecture: 10-80% in approximately 24 minutes at a 350kW charger','Leatherette seating standard'],
+       talk:'EV9 at $56K vs a gas 3-row at the same price — but with no gas costs ever, potential tax credit, and a 3rd row adults actually fit in. That\'s the fundamental pitch.'},
+      {name:'Land',price:'$63,000',tag:'The comfort and technology step-up',
+       pts:['NEW: Full leather + heated & ventilated front seats','NEW: Panoramic glass roof — floods every row with light','NEW: Heads-Up Display (HUD)','Smart power liftgate with foot-activated sensor','NEW: 5-zone climate — every row independently controlled','Highway Driving Assist 2.0 — semi-autonomous highway operation'],
+       talk:'The Land is the volume seller — where the EV9 starts feeling like a Cadillac Escalade competitor at a fraction of the price. Panoramic roof, HUD, ventilated seats is a powerful combination.'},
+      {name:'Land Long Range',price:'$68,000',tag:'304 miles — maximum range for family road trips',
+       pts:['NEW: 304-mile range — maximum available in the EV9 lineup','NEW: 384hp dual-motor AWD upgrade','All Land trim features included — full luxury spec','Road trip ready: 300+ miles realistic, one fast charge stop per leg','Full leather seating — same as Land trim','Panoramic glass roof standard','Home power backup via V2L in extended outage situations','The range objection is officially gone for road-tripping families'],
+       talk:'The Long Range Land is for families who road trip 2-3 times per year. 304 miles + fast charge capability means Miami to Atlanta is one stop. That\'s practical, not aspirational.'},
+      {name:'GT-Line',price:'$72,000',tag:'Sport exterior treatment with flagship spec',
+       pts:['GT-Line exterior: unique bumpers, 21" wheels, sport-inspired trim pieces','Full Land Long Range spec underneath — maximum power and range','Sport-bolstered seats with contrast stitching throughout','Exclusive exterior color options not on standard trims','Visual statement vehicle in the EV9 lineup','Turns heads in every parking lot — strong identity purchase'],
+       talk:'The GT-Line is for the customer who doesn\'t want the EV9 to look like a family hauler. It doesn\'t. It looks like what a full-size SUV becomes when it goes all-electric.'},
+      {name:'GT (576hp)',price:'$78,000',tag:'576hp dual-motor — the quickest 3-row SUV made',
+       pts:['NEW: 576hp — 0-60 in 4.3s in a full 3-row SUV','e-LSD and sport-tuned suspension — genuinely dynamic handling','NEW: Brembo brakes + sport suspension','Unique GT exterior with wider body and 22" wheels','Full luxury interior: Nappa leather, massaging seats, Meridian audio','No other vehicle at any price offers: 3-row + full EV + 576hp'],
+       talk:'The EV9 GT is a party trick with a warranty. 0-60 in 4.3 seconds. Three rows. Electric. $78K. There is no other vehicle on the planet that does this. For the right customer — that is all you need to say.'}
+    ],
+    objs:[
+      {q:"I can't spend $56,000 on an electric car",a:"Before we move on — federal tax credit may bring it to ~$49K effective. No gas, no oil changes, lower insurance. Over 5 years, total cost of ownership vs a $45K gas 3-row is typically within a few thousand dollars."},
+      {q:"What if I need to charge on a road trip?",a:"The EV9 covers CCS chargers nationwide plus NACS adapter capability. At 295-304 mile range, a typical family road trip means one charge stop per 5-6 hours. At 800V, that stop is 25 minutes — coffee and restroom break."},
+      {q:"I need AWD — does it have it?",a:"Every EV9 except the entry has dual-motor AWD. EV AWD is actually better than mechanical AWD — torque goes to each axle independently, instantly. In wet conditions, EV AWD outperforms traditional systems."}
+    ]}
+};
+
+function showModel(id, btn){
+  document.querySelectorAll('.kb-model-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('kb-welcome').style.display='none';
+  const d=KB[id];
+  if(!d)return;
+  const newBadge=d.isNew?'<span class="new-tag">All New</span>':"";
+  let tabsHtml=d.trims.map((t,i)=>`<button class="trim-tab${i===0?' active':''}" onclick="switchTrim(${i})">${t.name}</button>`).join('');
+  let trimsHtml=d.trims.map((t,i)=>`
+    <div class="trim-content${i===0?' active':''}" id="tc-${i}">
+      <div class="trim-top">
+        <div class="trim-name-big">${t.name}</div>
+        <div class="trim-tagline">${t.tag}</div>
+        <div class="trim-price">Starting at ${t.price}</div>
+      </div>
+      <div class="trim-grid">
+        <div class="trim-card">
+          <div class="trim-card-title">Selling Points</div>
+          <ul class="selling-points">${t.pts.map(p=>{
+            const isNew=p.startsWith('NEW:');
+            const text=isNew?p.slice(4).trim():p;
+            const tl=text.toLowerCase();
+            const isLeather=tl.includes('leather')||tl.includes('leatherette')||tl.includes('nappa');
+            const isSunroof=tl.includes('sunroof')||tl.includes('panoramic');
+            const isHEV=tl.includes('hybrid')&&!tl.includes('plug')&&!tl.includes('phev');
+            const isPHEV=tl.includes('phev')||tl.includes('plug-in')||tl.includes('plug in');
+            const tags=[];
+            if(isLeather) tags.push('<span class="feat-tag ft-leather">Leather</span>');
+            if(isSunroof) tags.push('<span class="feat-tag ft-sunroof">Sunroof</span>');
+            if(isPHEV)    tags.push('<span class="feat-tag ft-phev">PHEV</span>');
+            else if(isHEV) tags.push('<span class="feat-tag ft-hev">HEV</span>');
+            const tagHtml=tags.join('');
+            const liClass=isNew?'upgrade':'';
+            if(isNew){
+              return '<li class="upgrade">'+(tagHtml?tagHtml+' ':'')+text+'</li>';
+            }
+            if(tags.length){
+              return '<li class="feat-highlight">'+tagHtml+'<span>'+text+'</span></li>';
+            }
+            return '<li>'+text+'</li>';
+          }).join('')}</ul>
+        </div>
+        <div>
+          <div class="trim-card">
+            <div class="trim-card-title">MSRP</div>
+            <div class="trim-price-big">${t.price}</div>
+            <div class="trim-price-note">Starting MSRP before incentives</div>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+  let objHtml=d.objs.map(o=>`<div class="obj-item"><div class="obj-q">"${o.q}"</div><div class="obj-a">${o.a}</div></div>`).join('');
+  document.getElementById('kb-model-area').innerHTML=`
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+      <div>
+        <div class="kb-model-title">${d.name}</div>
+        <div style="font-size:14px;color:var(--text-secondary);margin-bottom:14px">${d.tagline}</div>
+      </div>
+      ${newBadge}
+    </div>
+    <div class="kb-meta-row">
+      <span class="kb-meta-pill hl">${d.badge}</span>
+      <span class="kb-meta-pill">From ${d.range.split(' ')[0]}</span>
+      <span class="kb-meta-pill">${d.mpg}</span>
+      <span class="kb-meta-pill">${d.seats} seats</span>
+      ${d.awd?'<span class="kb-meta-pill">AWD Available</span>':''}
+    </div>
+    <div class="overview-box">${d.overview}</div>
+    <div class="model-divider"></div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Trim Levels</div>
+    <div class="trim-tabs">${tabsHtml}</div>
+    ${trimsHtml}
+    <div class="objections-section">
+      <div class="obj-header">Objection Handling</div>
+      ${objHtml}
+    </div>`;
+  window.scrollTo({top:0});
+}
+
+function switchTrim(idx){
+  document.querySelectorAll('.trim-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.trim-content').forEach((c,i)=>c.classList.toggle('active',i===idx));
+}
+
+
+// ===== KB TAB SWITCHER =====
+function switchKbTab(tab){
+  var mb=document.getElementById('kb-tab-models');
+  var sb=document.getElementById('kb-tab-search');
+  var ml=document.getElementById('kb-models-list');
+  var sp=document.getElementById('kb-search-panel');
+  var ma=document.getElementById('kb-model-area');
+  var sa=document.getElementById('kb-search-area');
+  var w=document.getElementById('kb-welcome');
+  if(tab==='models'){
+    mb.classList.add('active');sb.classList.remove('active');
+    ml.style.display='block';sp.style.display='none';sa.style.display='none';
+    if(ma.innerHTML.trim()){ma.style.display='block';if(w)w.style.display='none';}
+    else{if(w)w.style.display='flex';}
+  } else {
+    sb.classList.add('active');mb.classList.remove('active');
+    ml.style.display='none';sp.style.display='block';
+    ma.style.display='none';if(w)w.style.display='none';
+    sa.style.display='block';
+    if(!sa.innerHTML.trim()){sa.innerHTML='<div class="search-empty"><div class="search-empty-line"></div><div class="search-empty-title">Feature Search</div><p class="search-empty-sub">Type a feature in the search box to find which models and trims include it.<br><br>Try: ventilated &bull; HUD &bull; sunroof &bull; AWD &bull; heated seats &bull; Bose &bull; hybrid &bull; 3 row &bull; nappa &bull; V2L &bull; brembo &bull; massaging</p></div>';}
+    setTimeout(function(){var i=document.getElementById('kb-search-input');if(i)i.focus();},80);
+  }
+}
+
+// ===== FEATURE INDEX =====
+var FI=[
+  {m:'2026 Kia K4',id:'k4',t:'LX',p:'$24,990',k:'touchscreen 12.3 wireless carplay android auto forward collision lane keep safety 35 mpg fuel economy warranty 10 year',n:'12.3" touchscreen, wireless CarPlay, full safety suite, 35 mpg, 10yr warranty — all standard'},
+  {m:'2026 Kia K4',id:'k4',t:'EX',p:'$26,500',k:'heated seats heated leatherette leather blind spot rear cross traffic wireless charging audio sound 6 speaker',n:'Heated seats, leatherette, blind spot warning, wireless phone charging, upgraded 6-speaker audio'},
+  {m:'2026 Kia K4',id:'k4',t:'GT-Line',p:'$27,200',k:'sunroof panoramic sunroof turbo turbocharged sport alloy wheels 18 inch wheels',n:'Panoramic sunroof available, 1.6T turbo, sport suspension, 18" alloy wheels'},
+  {m:'2026 Kia K4',id:'k4',t:'GT-Line Turbo',p:'$28,500',k:'bose premium sound ventilated seats ventilated turbo turbocharged 190hp sunroof panoramic sunroof performance',n:'Bose audio, ventilated seats, 190hp turbo, panoramic sunroof — under $30K'},
+  {m:'2026 Kia K5',id:'k5',t:'LXS',p:'$27,290',k:'awd all wheel drive heated seats heated touchscreen 12.3 wireless carplay safety forward collision blind spot',n:'AWD available, 12.3" touchscreen, heated seats, full safety suite standard'},
+  {m:'2026 Kia K5',id:'k5',t:'EX',p:'$29,900',k:'leatherette leather power seat lumbar dual zone climate control surround view camera 360 camera smart key',n:'Leatherette, power seat, dual-zone climate, surround view camera, smart key'},
+  {m:'2026 Kia K5',id:'k5',t:'GT-Line',p:'$32,500',k:'sunroof panoramic sunroof sport bose premium sound turbo turbocharged 19 inch wheels',n:'Panoramic sunroof available, 19" wheels, Bose audio, 1.6T turbo option'},
+  {m:'2026 Kia K5',id:'k5',t:'GT',p:'$37,000',k:'290hp performance brembo brembo brakes nappa leather nappa ventilated seats ventilated heated seats awd all wheel drive twin scroll fastest sport',n:'290hp AWD, Brembo brakes, Nappa leather, ventilated seats front and rear — competes with Genesis G70'},
+  {m:'2026 Kia Seltos',id:'seltos',t:'LX',p:'$25,285',k:'awd all wheel drive touchscreen wireless carplay safety forward collision heated heated seats 31 mpg fuel economy warranty',n:'AWD available, 10.25" touchscreen, wireless CarPlay, safety suite, 31 mpg, 10yr warranty'},
+  {m:'2026 Kia Seltos',id:'seltos',t:'EX',p:'$28,500',k:'heated seats heated leatherette leather blind spot dual zone climate sunroof panoramic sunroof',n:'Heated seats, leatherette, panoramic sunroof available, dual-zone climate'},
+  {m:'2026 Kia Seltos',id:'seltos',t:'SX',p:'$32,000',k:'bose premium sound ventilated seats ventilated power seat memory seat highway driving assist semi autonomous sunroof panoramic sunroof',n:'Bose audio, ventilated seats, power/memory seat, highway driving assist, panoramic sunroof'},
+  {m:'2027 Kia Seltos Hybrid',id:'seltos',t:'Hybrid',p:'$30,000',k:'hybrid 38 mpg fuel economy awd all wheel drive sunroof panoramic sunroof 360 camera memory seat touchscreen 12.3',n:'First Seltos hybrid — 38 mpg AWD; panoramic sunroof, 360-cam, memory seat — all-new 2027 design'},
+  {m:'2026 Kia Niro',id:'niro',t:'LX Hybrid',p:'$28,550',k:'53 mpg hybrid fuel economy efficiency touchscreen wireless carplay safety forward collision lane keep',n:'53 mpg combined — best non-EV in the lineup; wireless CarPlay, full safety suite standard'},
+  {m:'2026 Kia Niro',id:'niro',t:'EX Hybrid',p:'$32,000',k:'heated seats heated leatherette leather power seat blind spot bose premium sound dual zone climate navigation nav',n:'Heated seats, leatherette, power seat, navigation, Bose audio available'},
+  {m:'2026 Kia Niro PHEV',id:'niro',t:'PHEV',p:'$35,500',k:'plug in hybrid phev ev range electric range charging home charging level 2 charge tax credit federal credit',n:'33-mile EV-only range, Level 2 home charging, federal EV tax credit eligible'},
+  {m:'2026 Kia Niro EV',id:'niro',t:'Full EV',p:'$40,000',k:'electric ev range charging fast charge dc fast charge v2l vehicle to load heat pump tax credit federal credit 253 mile',n:'253-mile EV range, DC fast charging, V2L, heat pump standard, EV tax credit eligible'},
+  {m:'2026 Kia Sportage',id:'sportage',t:'LX',p:'$30,290',k:'12.3 touchscreen wireless carplay highway driving assist blind spot awd all wheel drive safety forward collision adaptive cruise rear cross traffic',n:'12.3" screen on every trim, wireless CarPlay, highway driving assist, adaptive cruise, blind spot, AWD avail'},
+  {m:'2026 Kia Sportage',id:'sportage',t:'EX',p:'$34,000',k:'heated seats heated leatherette leather panoramic sunroof sunroof power seat rear heated seats rear heated wireless charging dual level cargo cargo floor',n:'Heated front AND rear seats, leatherette, panoramic sunroof, power seat, dual-level cargo floor'},
+  {m:'2026 Kia Sportage',id:'sportage',t:'SX-Prestige',p:'$38,000',k:'bose premium sound hud heads up display ventilated seats ventilated navigation nav smart liftgate power liftgate leather full leather',n:'Bose audio, HUD, ventilated seats, navigation, smart power liftgate, full leather'},
+  {m:'2026 Kia Sportage Hybrid',id:'sportage',t:'Hybrid EX',p:'$37,000',k:'hybrid 39 mpg fuel economy efficiency awd all wheel drive',n:'39 mpg hybrid — class-leading for any compact SUV; AWD available'},
+  {m:'2026 Kia Sportage PHEV',id:'sportage',t:'PHEV',p:'$42,500',k:'plug in hybrid phev ev range electric range charging home charging tax credit federal credit awd all wheel drive 34 mile',n:'34-mile EV range, AWD standard, federal EV tax credit eligible'},
+  {m:'2026 Kia Sorento',id:'sorento',t:'LX',p:'$33,635',k:'3 row third row 7 passenger towing 5000 lb tow awd all wheel drive warranty 10 year safety forward collision',n:'3-row 7-passenger, 5,000 lb tow rating, AWD available, 10yr warranty — best value 3-row entry'},
+  {m:'2026 Kia Sorento',id:'sorento',t:'S',p:'$36,500',k:'heated seats heated leatherette leather blind spot smart key rear cross traffic',n:'Heated seats, leatherette, blind spot warning, smart key'},
+  {m:'2026 Kia Sorento',id:'sorento',t:'EX',p:'$40,000',k:'panoramic sunroof sunroof power seat lumbar navigation nav smart liftgate power liftgate ventilated seats ventilated 3 zone climate control',n:'Panoramic sunroof, ventilated seats, 3-zone climate, smart liftgate, navigation, power seat'},
+  {m:'2026 Kia Sorento Hybrid',id:'sorento',t:'Hybrid EX',p:'$43,000',k:'hybrid 37 mpg fuel economy efficiency awd all wheel drive 3 row third row',n:'37 mpg hybrid — best mpg of any 3-row SUV sold in the US; AWD standard'},
+  {m:'2026 Kia Sorento',id:'sorento',t:'SX Prestige',p:'$48,000',k:'nappa leather nappa bose premium sound hud heads up display highway driving assist remote parking smart parking ventilated seats ventilated',n:'Nappa leather, Bose 10-speaker, HUD, HDA 2.0, remote smart parking — flagship spec'},
+  {m:'2027 Kia Telluride',id:'telluride',t:'LX',p:'$40,735',k:'3 row third row 8 passenger awd all wheel drive safety forward collision blind spot warranty 10 year',n:'3-row 8-passenger, AWD available, full safety suite, 10yr warranty — completely redesigned 2027'},
+  {m:'2027 Kia Telluride',id:'telluride',t:'S',p:'$44,000',k:'panoramic sunroof sunroof heated seats heated leatherette leather rear heated seats rear heated captain chairs captain seats navigation nav',n:'Panoramic sunroof, heated front/rear seats, leatherette, captain chairs available, navigation'},
+  {m:'2027 Kia Telluride',id:'telluride',t:'EX',p:'$48,000',k:'leather full leather ventilated seats ventilated 3 zone climate control hud heads up display smart liftgate highway driving assist',n:'Full leather, ventilated seats, 3-zone climate, HUD, smart liftgate, highway driving assist'},
+  {m:'2027 Kia Telluride Hybrid',id:'telluride',t:'Hybrid',p:'$48,000',k:'hybrid 28 mpg 30 mpg fuel economy efficiency awd all wheel drive 3 row third row 8 passenger',n:'First-ever Telluride hybrid ~28-30 mpg; AWD standard, same 8-passenger capacity — no compromise'},
+  {m:'2027 Kia Telluride',id:'telluride',t:'SX Prestige',p:'$54,000',k:'nappa leather nappa bose premium sound massaging seats massage 5 zone climate control remote parking smart parking ventilated seats ventilated heated seats',n:'Nappa leather, Bose 10-speaker, massaging front seats, 5-zone climate, remote smart parking'},
+  {m:'2027 Kia Telluride X-Pro',id:'telluride',t:'X-Pro',p:'$57,285',k:'off road offroad locking differential skid plates all terrain all terrain tires x pro xpro terrain mode',n:'Locking rear diff, skid plates, all-terrain tires, X-Terrain mode — plus full SX Prestige luxury spec'},
+  {m:'2026 Kia Carnival',id:'carnival',t:'LX',p:'$37,500',k:'8 passenger sliding door power sliding door 3 row third row cargo 145 cu ft safety forward collision blind spot warranty',n:'8-passenger, power sliding doors, 145 cu ft max cargo, full safety suite'},
+  {m:'2026 Kia Carnival',id:'carnival',t:'EX',p:'$42,000',k:'leather leatherette heated seats heated ventilated seats ventilated navigation nav panoramic sunroof dual sunroof sunroof 3 zone climate control',n:'Leather, heated + ventilated seats, panoramic dual sunroof, 3-zone climate, navigation'},
+  {m:'2026 Kia Carnival',id:'carnival',t:'SX',p:'$46,000',k:'vip lounge vip seats reclining seats recline footrest ottoman bose premium sound 4 zone climate control highway driving assist semi autonomous',n:'VIP lounge seats (170 deg recline + ottoman + footrest), Bose 12-speaker, 4-zone climate, HDA'},
+  {m:'2026 Kia Carnival Hybrid',id:'carnival',t:'Hybrid',p:'$48,000',k:'hybrid 30 mpg fuel economy efficiency 8 passenger sliding door minivan',n:'30+ mpg hybrid — addresses #1 minivan objection; same 8-passenger layout and sliding doors'},
+  {m:'2026 Kia Carnival',id:'carnival',t:'SX Prestige',p:'$51,000',k:'vip lounge vip seats entertainment screens seat screens rear entertainment power running boards remote start massaging seats massage',n:'VIP lounge + individual rear entertainment screens, power running boards, remote start with pre-conditioning'},
+  {m:'2026 Kia EV6',id:'ev6',t:'Standard Range RWD',p:'$42,900',k:'electric ev range nacs tesla supercharger supercharger charging safety forward collision tax credit federal credit 232 mile',n:'232-mile range, NACS port (full Tesla Supercharger network), EV tax credit up to $7,500 eligible'},
+  {m:'2026 Kia EV6',id:'ev6',t:'Long Range RWD',p:'$47,000',k:'310 mile range electric ev 800v fast charge v2l vehicle to load heat pump ventilated seats ventilated heated seats heated nacs supercharger',n:'310-mile range, 800V fast charge (18 min 10-80%), V2L, heat pump, ventilated + heated seats'},
+  {m:'2026 Kia EV6',id:'ev6',t:'Long Range AWD',p:'$51,000',k:'awd all wheel drive 320hp performance electric ev range bose premium sound hud heads up display 274 mile',n:'320hp AWD, 0-60 in 5.1s, 274-mile range, Bose audio, HUD available'},
+  {m:'2026 Kia EV6 GT',id:'ev6',t:'GT',p:'$58,000',k:'576hp gt performance fastest brembo brembo brakes nappa leather nappa 21 inch wheels sport 0-60 3.4 seconds',n:'576hp dual-motor, 0-60 in 3.4s, Brembo brakes, Nappa leather, 21" wheels — fastest Kia ever built'},
+  {m:'2026 Kia EV9',id:'ev9',t:'Standard AWD',p:'$56,545',k:'electric ev 3 row third row 7 passenger range v2l vehicle to load 800v fast charge tax credit federal credit awd all wheel drive 295 mile',n:'295-mile 3-row EV, V2L (powers home in outage), 800V fast charge, EV tax credit up to $7,500'},
+  {m:'2026 Kia EV9',id:'ev9',t:'Land',p:'$63,000',k:'heated seats heated ventilated seats ventilated leather full leather panoramic glass roof sunroof hud heads up display smart liftgate 5 zone climate control highway driving assist',n:'Full leather, heated + ventilated seats, panoramic glass roof, HUD, 5-zone climate, HDA'},
+  {m:'2026 Kia EV9',id:'ev9',t:'Land Long Range',p:'$68,000',k:'304 mile range electric ev awd all wheel drive 384hp long range',n:'304-mile range (maximum in lineup), 384hp AWD — full Land spec with best range available'},
+  {m:'2026 Kia EV9 GT-Line',id:'ev9',t:'GT-Line',p:'$72,000',k:'21 inch wheels sport gt line gtline exterior unique colors',n:'GT-Line sport exterior + 21" wheels + exclusive colors; full leather seating and panoramic glass roof from Land spec'},
+  {m:'2026 Kia EV9 GT',id:'ev9',t:'GT',p:'$78,000',k:'576hp gt performance fastest brembo brembo brakes nappa leather nappa 22 inch wheels 0-60 4.3 seconds massaging seats massage bose premium sound',n:'576hp AWD, 0-60 in 4.3s, Brembo brakes, Nappa leather, massaging seats, Bose — fastest 3-row SUV ever'}
+];
+
+function runFeatureSearch(){
+  var q=(document.getElementById('kb-search-input').value||'').toLowerCase().trim();
+  var area=document.getElementById('kb-search-area');
+  if(!q||q.length<2){
+    area.innerHTML='<div class="search-empty"><div class="search-empty-line"></div><div class="search-empty-title">Feature Search</div><p class="search-empty-sub">Type a feature to find which models and trims include it.<br><br>Try: ventilated &bull; HUD &bull; towing &bull; sunroof &bull; AWD &bull; heated seats &bull; Bose &bull; hybrid &bull; 3 row &bull; nappa &bull; V2L &bull; brembo &bull; massaging</p></div>';
+    return;
+  }
+  var results=FI.filter(function(x){return x.k.indexOf(q)!==-1||x.t.toLowerCase().indexOf(q)!==-1||x.m.toLowerCase().indexOf(q)!==-1||x.n.toLowerCase().indexOf(q)!==-1;});
+  if(!results.length){
+    area.innerHTML='<div class="search-empty"><div class="search-empty-line"></div><div class="search-empty-title">No Results for &ldquo;'+q+'&rdquo;</div><p class="search-empty-sub">Try: ventilated, AWD, sunroof, towing, HUD, Bose, hybrid, 3 row, heated, leather, nappa, brembo, V2L, massaging</p></div>';
+    return;
+  }
+  var grouped={};
+  results.forEach(function(r){if(!grouped[r.m])grouped[r.m]={id:r.id,rows:[]};grouped[r.m].rows.push(r);});
+  var mCount=Object.keys(grouped).length;
+  var html='<div style="margin-bottom:20px"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:28px;font-weight:800;color:var(--charcoal);margin-bottom:4px">Results for &ldquo;'+q+'&rdquo;</div><div style="font-size:13px;color:var(--muted)">'+results.length+' trim'+(results.length!==1?'s':'')+' across '+mCount+' model'+(mCount!==1?'s':'')+' include this feature</div></div>';
+  Object.keys(grouped).forEach(function(mn){
+    var g=grouped[mn];
+    html+='<div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px">';
+    html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">';
+    html+='<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:22px;font-weight:700;color:var(--charcoal)">'+mn+'</div>';
+    html+='<button class="search-view-btn" onclick="goToModel(\''+g.id+'\')>View Full Model</button>';
+    html+='</div>';
+    g.rows.forEach(function(r){
+      html+='<div style="display:flex;align-items:flex-start;gap:16px;padding:10px 0;border-bottom:1px solid #f5f5f5">';
+      html+='<div style="flex-shrink:0;min-width:150px"><div style="font-size:14px;font-weight:700;color:var(--charcoal)">'+r.t+'</div><div style="font-size:12px;color:var(--red);font-weight:700;margin-top:3px">'+r.p+'</div></div>';
+      html+='<div style="font-size:13px;color:var(--mid);line-height:1.6">'+r.n+'</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+  });
+  area.innerHTML=html;
+}
+
+function goToModel(id){
+  switchKbTab('models');
+  var btns=document.querySelectorAll('.kb-model-btn');
+  for(var i=0;i<btns.length;i++){
+    var oc=btns[i].getAttribute('onclick')||'';
+    if(oc.indexOf("'"+id+"'")!==-1){showModel(id,btns[i]);break;}
+  }
+}
+
+
+// ── MOBILE SIDEBAR ──
+function toggleSidebar(){
+  var s=document.getElementById('kb-sidebar');
+  var o=document.getElementById('kb-overlay');
+  if(s&&o){s.classList.toggle('open');o.classList.toggle('active');}
+}
+function closeSidebar(){
+  var s=document.getElementById('kb-sidebar');
+  var o=document.getElementById('kb-overlay');
+  if(s)s.classList.remove('open');
+  if(o)o.classList.remove('active');
+}
+function openMobileSearch(){
+  switchKbTab('search');
+  var s=document.getElementById('kb-sidebar');
+  var o=document.getElementById('kb-overlay');
+  if(window.innerWidth<=768&&s&&o){s.classList.add('open');o.classList.add('active');}
+}
+
+// Init
+updateCredit(5);
+// Show KB by default
+document.getElementById('kb-welcome').style.display='flex';
+</script>
+</body>
+</html>
